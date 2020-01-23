@@ -1,0 +1,1 @@
+random stuffs for training golang
