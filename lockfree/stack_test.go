@@ -7,7 +7,7 @@ import (
 )
 
 func TestNormalStack(t *testing.T) {
-	s := Stack{}
+    s := Stack{}
     _, err := s.pop()
     if err == nil {
         t.Error("Pop from empty stack should raise exception")
