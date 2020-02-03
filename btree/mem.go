@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sort"
 )
 
 // this BPlusTree requires all keys to be unique
@@ -13,16 +14,15 @@ type LeafNode struct {
 	rightSibling *LeafNode
 }
 
-func (leaf LeafNode) getValue(target int) (int, error) {
+func (leaf LeafNode) getValue(key int) (int, error) {
 	if len(leaf.keys) != len(leaf.values) {
 		return 0, errors.New("LeafNode's keys and values should have similar number of items")
 	}
-	for index, key := range leaf.keys {
-		if key == target {
-			return leaf.values[index], nil
-		}
+	index := sort.SearchInts(leaf.keys, key)
+	if index == len(leaf.keys) || leaf.keys[index] != key {
+		return 0, errors.New(fmt.Sprintf("Key %d not found", key))
 	}
-	return 0, errors.New(fmt.Sprintf("Key %d not found", target))
+	return leaf.values[index], nil
 }
 
 type InternalNode struct {
@@ -36,13 +36,7 @@ func (node *InternalNode) searchPossibleLeafNode(key int) (*LeafNode, error) {
 	if len(node.keys)+1 != len(node.children) {
 		return nil, errors.New(fmt.Sprintf("There is an internal node in failed state: %d keys and %d children", len(node.keys), len(node.children)))
 	}
-	chosenIndex := len(node.keys)
-	for idx := 0; idx < len(node.keys); idx++ {
-		if key <= node.keys[idx] {
-			chosenIndex = idx
-			break
-		}
-	}
+	chosenIndex := sort.SearchInts(node.keys, key)
 	switch child := node.children[chosenIndex].(type) {
 	case *LeafNode:
 		return child, nil
