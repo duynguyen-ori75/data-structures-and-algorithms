@@ -6,6 +6,7 @@ import (
 	"reflect"
 )
 
+// this should return the leaf node that the key should belong to
 func (tree *BPlusTree) search(key int) (*LeafNode, error) {
 	var leaf *LeafNode
 	switch root := tree.root.(type) {
@@ -19,10 +20,6 @@ func (tree *BPlusTree) search(key int) (*LeafNode, error) {
 		leaf = root
 	default:
 		return nil, errors.New(fmt.Sprintf("Class of a node should be LeafNode or InternalNode insted of %s", reflect.TypeOf(root).String()))
-	}
-	_, err := leaf.getValue(key)
-	if err != nil {
-		return nil, err
 	}
 	return leaf, nil
 }

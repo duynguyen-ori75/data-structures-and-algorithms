@@ -1,7 +1,6 @@
 package btree
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -16,8 +15,9 @@ func newTestTree() *BPlusTree {
 		newLeafNode([]int{6, 9}, []int{12, 2}, root),
 		newLeafNode([]int{14, 15}, []int{2, 8}, root),
 	)
-	root.children[0].(*LeafNode).rightSibling, root.children[1].(*LeafNode).rightSibling, root.children[2].(*LeafNode).rightSibling =
-		root.children[1].(*LeafNode), root.children[2].(*LeafNode), root.children[3].(*LeafNode)
+	for idx := 0; idx < 3; idx++ {
+		root.children[idx].(*LeafNode).rightSibling = root.children[idx+1].(*LeafNode)
+	}
 	return &BPlusTree{degree: 2, root: root}
 }
 
@@ -41,7 +41,7 @@ func TestLeafNodeGetValue(t *testing.T) {
 	node.values = append(node.values, 7)
 	val, err = node.getValue(4)
 	if err == nil || err.Error() != "Key 4 not found" {
-		t.Error(fmt.Sprintf("Should raise key not found instead of: %s", err.Error()))
+		t.Errorf("Should raise key not found instead of: %s", err.Error())
 	}
 	val, err = node.getValue(5)
 	if err != nil || val != 2 {
@@ -52,12 +52,12 @@ func TestLeafNodeGetValue(t *testing.T) {
 func TestSearch(t *testing.T) {
 	tree := newTestTree()
 	node, err := tree.search(7)
-	if err == nil || err.Error() != "Key 7 not found" {
-		t.Error(fmt.Sprintf("Should raise key 7 not found instead of: %s", err.Error()))
+	if err != nil || !reflect.DeepEqual(node.keys, []int{6, 9}) {
+		t.Errorf("Serch does not return correct LeafNode. Keys of found node: %s", arrayToString(node.keys))
 	}
 	node, err = tree.search(1)
 	if err != nil || node.keys[0] != 1 {
-		t.Error("Search does not return correct LeafNode")
+		t.Errorf("Search does not return correct LeafNode. Keys of found node: %s", arrayToString(node.keys))
 	}
 }
 
@@ -84,5 +84,63 @@ func TestLeafNodeInsert(t *testing.T) {
 	}
 	if !reflect.DeepEqual(testLeafNode.rightSibling.values, []int{10}) {
 		t.Errorf("Current node's keys are not correct. Should be [10] instead of %s", arrayToString(testLeafNode.keys))
+	}
+}
+
+func TestTreeInsert(t *testing.T) {
+	tree := newTestTree()
+	err := tree.insert(1, 2)
+	if err == nil {
+		t.Error("Key already exists exception should be raised")
+	}
+	err = tree.insert(7, 3)
+	if err != nil {
+		t.Errorf("Tree should insert correctly. Exception: %s", err.Error())
+	}
+	thirdChild := tree.root.(*InternalNode).children[2].(*LeafNode)
+	if !reflect.DeepEqual(thirdChild.keys, []int{6, 7, 9}) {
+		t.Errorf("Third child should have keys [6, 7, 9] instead of %s", arrayToString(thirdChild.keys))
+	}
+	if !reflect.DeepEqual(thirdChild.values, []int{12, 3, 2}) {
+		t.Errorf("Third child should have keys [12, 3, 2] instead of %s", arrayToString(thirdChild.values))
+	}
+}
+
+func TestTreeInsertFromScratch(t *testing.T) {
+	tree := newBPlusTree(1)
+	err := tree.insert(1, 5)
+	if err != nil {
+		t.Error("Insert shouldn't raise any exception")
+	}
+	_, ok := tree.root.(*LeafNode)
+	if !ok {
+		t.Error("Type of 1-node tree's root should be a LeafNode")
+	}
+	err = tree.insert(2, 5)
+	if err != nil {
+		t.Error("Insert shouldn't raise any exception")
+	}
+	root, ok := tree.root.(*InternalNode)
+	if !ok {
+		t.Error("Type of 2-node tree's root should be a InternalNode")
+	}
+	if len(root.children) != 2 {
+		t.Error("2-node tree should have two LeafNodes and 1 InternalNode")
+	}
+	err = tree.insert(3, 2)
+	if err != nil {
+		t.Error("Insert shouldn't raise any error")
+	}
+	if !reflect.DeepEqual(tree.root.(*InternalNode).keys, []int{3}) {
+		t.Errorf("Root's keys should be [3] instead of %s", arrayToString(tree.root.(*InternalNode).keys))
+	}
+	leftChild, okLeft := tree.root.(*InternalNode).children[0].(*InternalNode)
+	rightChild, okRight := tree.root.(*InternalNode).children[1].(*InternalNode)
+	if !okLeft || !okRight {
+		t.Error("Two children should be both InternalNodes")
+	}
+	if !reflect.DeepEqual(leftChild.keys, []int{2}) || !reflect.DeepEqual(rightChild.keys, []int{3}) {
+		t.Errorf("Left child's keys and right child's keys should be [2]/[3] instead of %s/%s",
+			arrayToString(leftChild.keys), arrayToString(rightChild.keys))
 	}
 }
