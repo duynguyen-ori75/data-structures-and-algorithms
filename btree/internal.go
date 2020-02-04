@@ -40,3 +40,7 @@ func (node *InternalNode) insertKey(newKey int, newChild interface{}, degree int
 	}
 	return node.parent.insertKey(sibling.keys[0], sibling, degree)
 }
+
+func (node *InternalNode) removeKey(key int, degree int) error {
+	return nil
+}

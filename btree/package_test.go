@@ -30,6 +30,14 @@ func TestHelper(t *testing.T) {
 	if !reflect.DeepEqual(a, []int{2, 5, 1, 4}) {
 		t.Errorf("Expected array should be %s instead of %s", arrayToString(a), arrayToString([]int{2, 5, 1, 4}))
 	}
+	a = removeInt(a, 1)
+	if !reflect.DeepEqual(a, []int{2, 1, 4}) {
+		t.Errorf("Expected array should be %s instead of %s", arrayToString(a), arrayToString([]int{2, 1, 4}))
+	}
+	a = removeInt(removeInt(removeInt(a, 2), 0), 0)
+	if len(a) != 0 {
+		t.Errorf("Slice after removing all elements should be empty. Current size %d", len(a))
+	}
 }
 
 func TestLeafNodeGetValue(t *testing.T) {

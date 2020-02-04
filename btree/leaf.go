@@ -22,8 +22,7 @@ func (leaf *LeafNode) insertValue(key int, value int, degree int) error {
 	if index < len(leaf.keys) && leaf.keys[index] == key {
 		return errors.New("All keys should be unique")
 	}
-	leaf.keys = insertInt(leaf.keys, index, key)
-	leaf.values = insertInt(leaf.values, index, value)
+	leaf.keys, leaf.values = insertInt(leaf.keys, index, key), insertInt(leaf.values, index, value)
 	if len(leaf.keys) <= 2*degree-1 {
 		return nil
 	}
@@ -36,4 +35,31 @@ func (leaf *LeafNode) insertValue(key int, value int, degree int) error {
 		return nil
 	}
 	return leaf.parent.insertKey(sibling.keys[0], sibling, degree)
+}
+
+func (leaf *LeafNode) deleteKey(key int, degree int) error {
+	index := sort.SearchInts(leaf.keys, key)
+	if index < len(leaf.keys) && leaf.keys[index] != key {
+		return fmt.Errorf("Key %d not found", key)
+	}
+	leaf.keys, leaf.values = removeInt(leaf.keys, index), removeInt(leaf.values, index)
+	if len(leaf.keys) >= degree {
+		return nil
+	}
+	// for simplicity, we will only merge/lend key with rightSibling
+	// it's much easier to test and reasonable with the goal of this repository
+	if leaf.rightSibling == nil {
+		return nil
+	}
+	if len(leaf.rightSibling.keys) > degree {
+		lendedKey := leaf.rightSibling.keys[0]
+		leaf.keys, leaf.values = append(leaf.keys, lendedKey), append(leaf.values, leaf.rightSibling.values[0])
+		leaf.rightSibling.keys, leaf.rightSibling.values = removeInt(leaf.rightSibling.keys, 0), removeInt(leaf.rightSibling.values, 0)
+		keyIndexAtParent := sort.SearchInts(leaf.parent.keys, lendedKey)
+		leaf.parent.keys[keyIndexAtParent] = leaf.rightSibling.keys[0]
+		return nil
+	}
+	leaf.keys, leaf.values = append(leaf.keys, leaf.rightSibling.keys...), append(leaf.values, leaf.rightSibling.values...)
+	leaf.rightSibling = leaf.rightSibling.rightSibling
+	return leaf.parent.removeKey(leaf.rightSibling.keys[0], degree)
 }

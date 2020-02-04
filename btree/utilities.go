@@ -17,6 +17,14 @@ func insertInterface(slice []interface{}, index int, newElement interface{}) []i
 	return append(slice[:index], append([]interface{}{newElement}, slice[index:]...)...)
 }
 
+func removeInt(slice []int, index int) []int {
+	return append(slice[:index], slice[index+1:]...)
+}
+
+func removeInterface(slice []interface{}, index int) []interface{} {
+	return append(slice[:index], slice[index+1:]...)
+}
+
 func newLeafNode(keys []int, values []int, parent *InternalNode) *LeafNode {
 	return &LeafNode{keys: keys, values: values, parent: parent}
 }
