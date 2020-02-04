@@ -3,14 +3,8 @@ package btree
 import (
 	"fmt"
 	"reflect"
-	"strings"
 	"testing"
 )
-
-func newLeafNode(keys []int, values []int, parent *InternalNode) *LeafNode {
-	result := &LeafNode{keys: keys, values: values, parent: parent}
-	return result
-}
 
 func newTestTree() *BPlusTree {
 	root := &InternalNode{}
@@ -27,16 +21,12 @@ func newTestTree() *BPlusTree {
 	return &BPlusTree{degree: 2, root: root}
 }
 
-func arrayToString(a []int) string {
-	return strings.Trim(strings.Replace(fmt.Sprint(a), " ", ",", -1), "[]")
-}
-
 func TestHelper(t *testing.T) {
 	a := []int{}
-	a = insertElement(a, 0, 5)
-	a = insertElement(a, 1, 4)
-	a = insertElement(a, 0, 2)
-	a = insertElement(a, 2, 1)
+	a = insertInt(a, 0, 5)
+	a = insertInt(a, 1, 4)
+	a = insertInt(a, 0, 2)
+	a = insertInt(a, 2, 1)
 	if !reflect.DeepEqual(a, []int{2, 5, 1, 4}) {
 		t.Errorf("Expected array should be %s instead of %s", arrayToString(a), arrayToString([]int{2, 5, 1, 4}))
 	}
@@ -72,5 +62,27 @@ func TestSearch(t *testing.T) {
 }
 
 func TestLeafNodeInsert(t *testing.T) {
-
+	testLeafNode := newLeafNode([]int{3}, []int{10}, nil)
+	err := testLeafNode.insertValue(1, 5, 1)
+	if err != nil {
+		t.Error("Test leaf node should insert value without any exception")
+	}
+	if testLeafNode.parent == nil || testLeafNode.rightSibling == nil {
+		t.Error("Parent node and sibling node should not be nil")
+	}
+	if !reflect.DeepEqual(testLeafNode.parent.keys, []int{3}) {
+		t.Errorf("Parent node's keys are not correct. Should be [3] instead of %s", arrayToString(testLeafNode.parent.keys))
+	}
+	if !reflect.DeepEqual(testLeafNode.keys, []int{1}) {
+		t.Errorf("Current node's keys are not correct. Should be [1] instead of %s", arrayToString(testLeafNode.keys))
+	}
+	if !reflect.DeepEqual(testLeafNode.rightSibling.keys, []int{3}) {
+		t.Errorf("Current node's keys are not correct. Should be [1] instead of %s", arrayToString(testLeafNode.keys))
+	}
+	if !reflect.DeepEqual(testLeafNode.values, []int{5}) {
+		t.Errorf("Current node's keys are not correct. Should be [5] instead of %s", arrayToString(testLeafNode.keys))
+	}
+	if !reflect.DeepEqual(testLeafNode.rightSibling.values, []int{10}) {
+		t.Errorf("Current node's keys are not correct. Should be [10] instead of %s", arrayToString(testLeafNode.keys))
+	}
 }

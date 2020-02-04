@@ -4,7 +4,7 @@
 - Lock-free stack
 
 ### WIP:
-- B+ Tree
+- B+ Tree (in memory)
 
 ### Planned:
 - SkipList
