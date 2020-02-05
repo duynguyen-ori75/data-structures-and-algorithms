@@ -8,8 +8,7 @@
 - Bloom filter
 
 ### WIP:
-
+- SkipList
 
 ### Planned:
-- SkipList
 - LSM tree
