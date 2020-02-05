@@ -1,10 +1,15 @@
 ## Random stuffs for training golang
 
+> You probably want to add this to your GOPATH env
+
 ### Done:
 - Lock-free stack
-- B+ Tree (too lazy to finish Del operation)
+- B+ Tree
+- Bloom filter
+
+### WIP:
+
 
 ### Planned:
 - SkipList
 - LSM tree
-- Resizable hash-table ??
