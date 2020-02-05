@@ -46,16 +46,6 @@ func (tree *BPlusTree) insert(key int, value int) error {
 }
 
 func (tree *BPlusTree) delete(key int) error {
-	leaf, err := tree.search(key)
-	if err != nil {
-		return err
-	}
-	err = leaf.deleteKey(key, tree.degree)
-	if err != nil {
-		return err
-	}
-	// even if the tree goes from 1 key -> 0 key, it is not necessary to
-	// remove the top-most InternalNode and replace it with an empty LeafNode
-	// therefore, we can simply return nil without updating root to top-most InternalNode
+	// TODO: too lazy to implement this
 	return nil
 }

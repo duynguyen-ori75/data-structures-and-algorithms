@@ -2,9 +2,7 @@
 
 ### Done:
 - Lock-free stack
-
-### WIP:
-- B+ Tree (in memory)
+- B+ Tree (too lazy to finish Del operation)
 
 ### Planned:
 - SkipList

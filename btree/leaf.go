@@ -39,7 +39,7 @@ func (leaf *LeafNode) insertValue(key int, value int, degree int) error {
 
 func (leaf *LeafNode) deleteKey(key int, degree int) error {
 	index := sort.SearchInts(leaf.keys, key)
-	if index < len(leaf.keys) && leaf.keys[index] != key {
+	if index >= len(leaf.keys) || leaf.keys[index] != key {
 		return fmt.Errorf("Key %d not found", key)
 	}
 	leaf.keys, leaf.values = removeInt(leaf.keys, index), removeInt(leaf.values, index)
@@ -49,10 +49,13 @@ func (leaf *LeafNode) deleteKey(key int, degree int) error {
 	// for simplicity, we will only merge/lend key with rightSibling
 	// it's much easier to test and reasonable with the goal of this repository
 	if leaf.rightSibling == nil {
+		if len(leaf.keys) == 0 && leaf.parent != nil {
+			return leaf.parent.removeKey(key)
+		}
 		return nil
 	}
+	lendedKey := leaf.rightSibling.keys[0]
 	if len(leaf.rightSibling.keys) > degree {
-		lendedKey := leaf.rightSibling.keys[0]
 		leaf.keys, leaf.values = append(leaf.keys, lendedKey), append(leaf.values, leaf.rightSibling.values[0])
 		leaf.rightSibling.keys, leaf.rightSibling.values = removeInt(leaf.rightSibling.keys, 0), removeInt(leaf.rightSibling.values, 0)
 		keyIndexAtParent := sort.SearchInts(leaf.parent.keys, lendedKey)
@@ -61,5 +64,5 @@ func (leaf *LeafNode) deleteKey(key int, degree int) error {
 	}
 	leaf.keys, leaf.values = append(leaf.keys, leaf.rightSibling.keys...), append(leaf.values, leaf.rightSibling.values...)
 	leaf.rightSibling = leaf.rightSibling.rightSibling
-	return leaf.parent.removeKey(leaf.rightSibling.keys[0], degree)
+	return leaf.parent.removeKey(lendedKey)
 }

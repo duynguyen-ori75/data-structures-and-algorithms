@@ -8,10 +8,10 @@ type LeafNode struct {
 }
 
 type InternalNode struct {
-	parent *InternalNode
-	keys   []int
-	// children can be a slice of pointers to LeafNode or InternalNode
-	children []interface{}
+	keys         []int
+	children     []interface{}
+	rightSibling *InternalNode
+	parent       *InternalNode
 }
 
 type BPlusTree struct {

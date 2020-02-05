@@ -31,7 +31,7 @@ func (node *InternalNode) insertKey(newKey int, newChild interface{}, degree int
 		return nil
 	}
 	sibling := &InternalNode{parent: node.parent, keys: node.keys[degree:], children: node.children[degree:]}
-	node.keys, node.children = node.keys[:degree], node.children[:degree+1]
+	node.keys, node.children, node.rightSibling = node.keys[:degree], node.children[:degree+1], sibling
 	if node.parent == nil {
 		parent := &InternalNode{keys: []int{sibling.keys[0]}}
 		parent.children = append(parent.children, node, sibling)
@@ -41,6 +41,7 @@ func (node *InternalNode) insertKey(newKey int, newChild interface{}, degree int
 	return node.parent.insertKey(sibling.keys[0], sibling, degree)
 }
 
-func (node *InternalNode) removeKey(key int, degree int) error {
+func (node *InternalNode) removeKey(key int) error {
+	// TODO: too lazy to implement this
 	return nil
 }

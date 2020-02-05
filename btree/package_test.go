@@ -152,3 +152,57 @@ func TestTreeInsertFromScratch(t *testing.T) {
 			arrayToString(leftChild.keys), arrayToString(rightChild.keys))
 	}
 }
+
+func TestLeafNodeRemoval(t *testing.T) {
+	testLeafNode := newLeafNode([]int{2, 5, 4}, []int{10, 2, 1}, nil)
+	err := testLeafNode.deleteKey(5, 2)
+	if err != nil || !reflect.DeepEqual(testLeafNode.keys, []int{2, 4}) {
+		t.Errorf("Delete operation should work correctly. Expected keys are [2, 4] instead of %s", arrayToString(testLeafNode.keys))
+	}
+	err = testLeafNode.deleteKey(2, 2)
+	if err != nil {
+		t.Error("Delete ops shouldn't raise any exception here")
+	}
+	err = testLeafNode.deleteKey(4, 2)
+	if err != nil {
+		t.Error("Delete ops shouldn't raise any exception here")
+	}
+	if len(testLeafNode.keys) != 0 {
+		t.Error("After 3 ops, leafNode should not have any key")
+	}
+	err = testLeafNode.deleteKey(1, 1)
+	if err == nil || err.Error() != "Key 1 not found" {
+		t.Error("Delete key from empty node should raise key not found exception")
+	}
+}
+
+func TestTreeRemoval(t *testing.T) {
+	t.Skip("Please implement InternalNode removeKey & tree remove operations")
+	tree := newTestTree()
+	err := tree.delete(9)
+	if err != nil || !reflect.DeepEqual(tree.root.(*InternalNode).keys, []int{2, 5}) {
+		t.Errorf("Delete ops should work correctly. Expected keys of root are [2, 5] instead of %s", arrayToString(tree.root.(*InternalNode).keys))
+	}
+	for key := 3; key <= 5; key++ {
+		err = tree.delete(key)
+		if err != nil {
+			t.Errorf("Delete should work correctly when tree is trying to remove key %d", key)
+		}
+	}
+	if !reflect.DeepEqual(tree.root.(*InternalNode).keys, []int{2}) {
+		t.Errorf("Delete ops should work correctly. Expected keys of root are [2] instead of %s", arrayToString(tree.root.(*InternalNode).keys))
+	}
+	err = tree.delete(2)
+	if err != nil {
+		t.Errorf("Delete should work correctly when tree is trying to remove key 2")
+	}
+	switch root := tree.root.(type) {
+	case *InternalNode:
+		t.Errorf("After deleting key 2, current root should be a LeafNode")
+	case *LeafNode:
+		if !reflect.DeepEqual(root.keys, []int{1, 6}) {
+			t.Errorf("Last two keys should be [1, 6] instead of %s", arrayToString(root.keys))
+		}
+	default:
+	}
+}
