@@ -6,9 +6,9 @@
 - Lock-free stack
 - B+ Tree
 - Bloom filter
+- SkipList
 
 ### WIP:
-- SkipList
 
 ### Planned:
 - LSM tree

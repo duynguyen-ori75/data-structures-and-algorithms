@@ -35,16 +35,7 @@ func (list *SkipList) Insert(key int, value int) error {
 	if key <= 0 {
 		return errors.New("All keys should be positive")
 	}
-	latestHeads, node := make([]*Node, list.maxLevel+1), list.head
-	for currentLevel := list.maxLevel; currentLevel >= 0; currentLevel-- {
-		for node.right != nil && node.right.key <= key {
-			node = node.right
-		}
-		latestHeads[currentLevel] = node
-		if currentLevel > 0 {
-			node = node.down
-		}
-	}
+	latestHeads, node := list.getRightMostNodes(key)
 	if node.key == key {
 		return fmt.Errorf("Key %d already exists", key)
 	}
@@ -62,6 +53,21 @@ func (list *SkipList) Insert(key int, value int) error {
 			lowerNode.up = newNode
 		}
 		latestHead.right, lowerNode = newNode, newNode
+	}
+	return nil
+}
+
+func (list *SkipList) Remove(key int) error {
+	latestHeads, _ := list.getRightMostNodes(key - 1)
+	for currentLevel, latestHead := range latestHeads {
+		node := latestHead.right
+		if node == nil || node.key != key {
+			if currentLevel == 0 {
+				return fmt.Errorf("Key %d not found", key)
+			}
+			break
+		}
+		latestHead.right = node.right
 	}
 	return nil
 }
