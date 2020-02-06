@@ -13,3 +13,4 @@
 
 ### Planned:
 - LSM tree
+- Download files from http 1.1 - IDM-like method
