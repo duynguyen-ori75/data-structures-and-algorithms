@@ -7,6 +7,7 @@
 - B+ Tree
 - Bloom filter
 - SkipList
+- LRU cache
 
 ### WIP:
 
