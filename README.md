@@ -10,6 +10,7 @@
 - LRU cache
 
 ### WIP:
+- SSTable (simple version)
 
 ### Planned:
 - LSM tree
