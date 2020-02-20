@@ -1,11 +1,9 @@
 package lsm
 
 import (
-	"encoding/binary"
-	"errors"
+	"bytes"
 	"fmt"
 	"github.com/google/uuid"
-	"os"
 	"reflect"
 	"sort"
 )
@@ -14,8 +12,8 @@ import (
 We will use utf-8 encoding to convert string to byte array and LittleEndian represent int in bytes
 
 Disk format:
-First 12 bytes: keySize - valueSize - numberOfKeys
-Next numberOfKeys * (keySize + 4 bytes) bytes: a list of tuple (key, keyIndex)
+First 12 bytes (three integers - 4 bytes each): keySize - valueSize - numberOfKeys
+Next numberOfKeys * (keySize + 4 bytes) bytes: a list of tuple (key, tupleOffset)
 Next numberOfKeys * (keySize + valueSize) bytes: a list of tuple (key, value)
 */
 
@@ -37,39 +35,35 @@ func NewTable(keySize int, valueSize int) (*SSTable, error) {
 	return &result, nil
 }
 
-func (table SSTable) dataFile() string {
-	return fmt.Sprintf("./db/%s.sstable", table.id.String())
-}
-
-func (table SSTable) makeStorage() (*os.File, error) {
-	_ = os.Mkdir("./db", 0755)
-	file, err := os.OpenFile(table.dataFile(), os.O_RDWR|os.O_CREATE, 0660)
+func NewTableFromID(id string) (*SSTable, error) {
+	tableId, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
-	file.Truncate(0)
-	file.Sync()
-	return file, nil
-}
-
-func (table SSTable) validateInput(key string, value string, doValidateValue bool) error {
-	if len(key) == 0 {
-		return errors.New("Key can not be empty")
+	file, err := openDbFile(dataFile(tableId))
+	if err != nil {
+		return nil, err
 	}
-	keyInBytes := []byte(key)
-	if len(keyInBytes) > table.keySize {
-		return errors.New("Key is bigger than expected")
-	}
-	if doValidateValue {
-		if len(value) == 0 {
-			return errors.New("Value can not be empty")
+	result := SSTable{id: tableId,
+		keySize:   readInt(file, -1),
+		valueSize: readInt(file, -1),
+		data:      make(map[string]interface{})}
+	numberOfKeys := readInt(file, -1)
+	keyInByte := make([]byte, result.keySize)
+	for idx := 0; idx < numberOfKeys; idx++ {
+		file.Read(keyInByte)
+		key, offset := string(bytes.Trim(keyInByte, "\x00")), readInt(file, -1)
+		dataKeyInByte, dataValueInByte := make([]byte, result.keySize), make([]byte, result.valueSize)
+		// ReadAt does not affect file's current cursor
+		file.ReadAt(dataKeyInByte, int64(offset))
+		file.ReadAt(dataValueInByte, int64(offset+result.keySize))
+		dataKey, dataValue := string(bytes.Trim(dataKeyInByte, "\x00")), string(bytes.Trim(dataValueInByte, "\x00"))
+		if key != dataKey {
+			return nil, fmt.Errorf("The index is wrong. Key in index is %s point to tuple (%s, %s)", key, dataKey, dataValue)
 		}
-		valueInBytes := []byte(value)
-		if len(valueInBytes) > table.valueSize {
-			return errors.New("Value is bigger than expected")
-		}
+		result.data[dataKey] = dataValue
 	}
-	return nil
+	return &result, nil
 }
 
 func (table *SSTable) Update(key string, value string) error {
@@ -90,10 +84,18 @@ func (table *SSTable) Delete(key string) error {
 	return nil
 }
 
-func writeInt(file *os.File, num int) {
-	bytes := make([]byte, 4)
-	binary.LittleEndian.PutUint32(bytes, uint32(num))
-	file.Write(bytes)
+func (table SSTable) Read(key string) (string, error) {
+	err := table.validateInput(key, "", false)
+	if err != nil {
+		return "", err
+	}
+	if val, ok := table.data[key]; ok {
+		if val == nil {
+			return "", fmt.Errorf("Key %s not found", key)
+		}
+		return val.(string), nil
+	}
+	return "", fmt.Errorf("Key %s not found", key)
 }
 
 func (table SSTable) Flush() error {
@@ -106,30 +108,40 @@ func (table SSTable) Flush() error {
 	// Flush all keys and values
 	// First: Build & flush the index
 	keys := make([]string, len(table.data))
-	for _, key := range reflect.ValueOf(table.data).MapKeys() {
-		keys = append(keys, key.Interface().(string))
+	for idx, key := range reflect.ValueOf(table.data).MapKeys() {
+		keys[idx] = key.Interface().(string)
 	}
 	sort.Strings(keys)
 	// append number of keys, so we can simply skip the index later
 	writeInt(file, len(keys))
+	// for simplicity, I won't implement any good data structure for the index
+	// I will just use a list of key
 	for index, key := range keys {
 		keyInBytes := []byte(key)
 		// padding to byte array
 		padding := make([]byte, table.keySize-len(keyInBytes))
 		keyInBytes = append(keyInBytes, padding...)
 		file.Write(keyInBytes)
-		binary.Write(file, binary.LittleEndian, index)
+		// current byte position of the expected tuple
+		// position = 12 (ignore first 12 bytes - which a three metadata)
+		// 			+ len(keys) * (table.keySize + 4) (the size of index block)
+		//			+ index * (table.keySize + table.valueSize) (the position of the tuple in data block)
+		offset := 12 + len(keys)*(table.keySize+4) + index*(table.keySize+table.valueSize)
+		writeInt(file, offset)
 	}
 	// Second: Build & flush the data
 	for _, key := range keys {
+		// padding to byte array
 		keyInBytes := []byte(key)
+		padding := make([]byte, table.keySize-len(keyInBytes))
+		keyInBytes = append(keyInBytes, padding...)
 		var valueInBytes []byte
 		switch value := table.data[key]; value {
 		case nil:
 			valueInBytes = make([]byte, table.valueSize)
 		default:
 			valueInBytes = []byte(value.(string))
-			padding := make([]byte, table.valueSize-len(valueInBytes))
+			padding = make([]byte, table.valueSize-len(valueInBytes))
 			valueInBytes = append(valueInBytes, padding...)
 		}
 		file.Write(keyInBytes)
