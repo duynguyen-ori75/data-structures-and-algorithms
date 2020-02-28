@@ -46,6 +46,10 @@ func (tree *BPlusTree) insert(key int, value int) error {
 }
 
 func (tree *BPlusTree) delete(key int) error {
-	// TODO: too lazy to implement this
-	return nil
+	node, err := tree.search(key)
+	if err != nil {
+		return nil
+	}
+	err = node.deleteKey(key, tree.degree)
+	return err
 }

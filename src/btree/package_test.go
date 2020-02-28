@@ -177,32 +177,16 @@ func TestLeafNodeRemoval(t *testing.T) {
 }
 
 func TestTreeRemoval(t *testing.T) {
-	t.Skip("Please implement InternalNode removeKey & tree remove operations")
 	tree := newTestTree()
 	err := tree.delete(9)
-	if err != nil || !reflect.DeepEqual(tree.root.(*InternalNode).keys, []int{2, 5}) {
-		t.Errorf("Delete ops should work correctly. Expected keys of root are [2, 5] instead of %s", arrayToString(tree.root.(*InternalNode).keys))
-	}
-	for key := 3; key <= 5; key++ {
-		err = tree.delete(key)
-		if err != nil {
-			t.Errorf("Delete should work correctly when tree is trying to remove key %d", key)
-		}
-	}
-	if !reflect.DeepEqual(tree.root.(*InternalNode).keys, []int{2}) {
-		t.Errorf("Delete ops should work correctly. Expected keys of root are [2] instead of %s", arrayToString(tree.root.(*InternalNode).keys))
-	}
-	err = tree.delete(2)
 	if err != nil {
-		t.Errorf("Delete should work correctly when tree is trying to remove key 2")
+		t.Errorf("Delete ops should not raise exception. Error: %s", err.Error())
 	}
-	switch root := tree.root.(type) {
-	case *InternalNode:
-		t.Errorf("After deleting key 2, current root should be a LeafNode")
-	case *LeafNode:
-		if !reflect.DeepEqual(root.keys, []int{1, 6}) {
-			t.Errorf("Last two keys should be [1, 6] instead of %s", arrayToString(root.keys))
-		}
-	default:
+	node, err := tree.search(9)
+	if err != nil {
+		t.Errorf("Search ops should not raise exception. Error: %s", err.Error())
+	}
+	if len(node.keys) != 1 || node.keys[0] != 6 {
+		t.Errorf("LeafNode's keys are not correct. Should be [6] instead of %s", arrayToString(node.keys))
 	}
 }

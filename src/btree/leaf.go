@@ -43,26 +43,5 @@ func (leaf *LeafNode) deleteKey(key int, degree int) error {
 		return fmt.Errorf("Key %d not found", key)
 	}
 	leaf.keys, leaf.values = removeInt(leaf.keys, index), removeInt(leaf.values, index)
-	if len(leaf.keys) >= degree {
-		return nil
-	}
-	// for simplicity, we will only merge/lend key with rightSibling
-	// it's much easier to test and reasonable with the goal of this repository
-	if leaf.rightSibling == nil {
-		if len(leaf.keys) == 0 && leaf.parent != nil {
-			return leaf.parent.removeKey(key)
-		}
-		return nil
-	}
-	lendedKey := leaf.rightSibling.keys[0]
-	if len(leaf.rightSibling.keys) > degree {
-		leaf.keys, leaf.values = append(leaf.keys, lendedKey), append(leaf.values, leaf.rightSibling.values[0])
-		leaf.rightSibling.keys, leaf.rightSibling.values = removeInt(leaf.rightSibling.keys, 0), removeInt(leaf.rightSibling.values, 0)
-		keyIndexAtParent := sort.SearchInts(leaf.parent.keys, lendedKey)
-		leaf.parent.keys[keyIndexAtParent] = leaf.rightSibling.keys[0]
-		return nil
-	}
-	leaf.keys, leaf.values = append(leaf.keys, leaf.rightSibling.keys...), append(leaf.values, leaf.rightSibling.values...)
-	leaf.rightSibling = leaf.rightSibling.rightSibling
-	return leaf.parent.removeKey(lendedKey)
+	return nil
 }
