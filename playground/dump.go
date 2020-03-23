@@ -11,6 +11,13 @@ import (
 const MODULO int64 = 12345678
 
 func power(x int64, y int64) int64 {
+	/*
+	var result int64 = 1
+	for times := int64(0); times < y; times ++ {
+		result = (result * x) % MODULO
+	}
+	return result
+	*/
 	if y <= 1 {
 		return int64(math.Pow(float64(x), float64(y)))
 	}
@@ -58,19 +65,11 @@ func goroutinesAggregation(n int64) int64 {
 	return result
 }
 
-func generatorAggregation(n int64) int64 {
-	defer timeTrack(time.Now(), "Generator aggregation")
-	numberOfWorkers := 4
+func workerAggregation(n int64, allAlements chan int64, numberOfWorkers int) int64 {
+	defer timeTrack(time.Now(), "Worker aggregation")
+	summary := make(chan int64, numberOfWorkers)
 	var wg sync.WaitGroup
 	wg.Add(numberOfWorkers)
-	allAlements, summary := make(chan int64), make(chan int64, numberOfWorkers)
-	// int generator
-	go func(n int64) {
-		for element := int64(1); element <= n; element++ {
-			allAlements <- element
-		}
-		close(allAlements)
-	}(n)
 	// 4 goroutines receiving int and doing aggregation
 	for numRoutine := 0; numRoutine < numberOfWorkers; numRoutine++ {
 		go func() {
@@ -83,16 +82,29 @@ func generatorAggregation(n int64) int64 {
 		}()
 	}
 	wg.Wait()
+	close(summary)
 	// aggregate all values
 	var result int64 = 0
-	for numRoutine := 0; numRoutine < numberOfWorkers; numRoutine++ {
-		result = (result + <-summary) % MODULO
+	for element := range summary {
+		result = (result + element) % MODULO
 	}
 	return result
 }
 
 func main() {
-	fmt.Println(normalAggregation(10000))
-	fmt.Println(goroutinesAggregation(10000))
-	fmt.Println(generatorAggregation(10000))
+	var n int64 = 1000000
+	fmt.Println(normalAggregation(n))
+	fmt.Println(goroutinesAggregation(n))
+
+	// worker method
+	numberOfWorkers := 16
+	allAlements := make(chan int64, n)
+	// int generator
+	go func(n int64) {
+		for element := int64(1); element <= n; element++ {
+			allAlements <- element
+		}
+		close(allAlements)
+	}(n)
+	fmt.Println(workerAggregation(n, allAlements, numberOfWorkers))
 }
