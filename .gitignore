@@ -1,3 +1,6 @@
 *.o
 src/lsm/db
 pkg/
+bin/
+src/github.com/
+src/golang.org/
