@@ -18,10 +18,20 @@ LEVEL3_CACHE_LINESIZE              64
 
 ## Benchmark result
 
+- Cacheline hit:
+	- BenchmarkMissCacheline
+	- BenchmarkHitCacheline
+- False sharing: 
+	- BenchmarkSimpleStruct
+	- BenchmarkPaddingStruct - a simple value with padding
+
 ```
 goos: linux
 goarch: amd64
-BenchmarkMissCacheline-8   	       1	1350396934 ns/op
-BenchmarkHitCacheline-8    	      15	  67326674 ns/op
+BenchmarkMissCacheline-8   	       2	 997796674 ns/op
+BenchmarkHitCacheline-8    	      36	  32767078 ns/op
+BenchmarkSimpleStruct-8    	     207	   5346920 ns/op
+BenchmarkPaddingStruct-8   	     438	   2668565 ns/op
 PASS
+ok  	_/home/duynguyen/Workplace/learning/src/benchmark	9.908s
 ```
