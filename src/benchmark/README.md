@@ -1,9 +1,10 @@
 # Cache benchmark information
 
 ## Machine info
-Lenovo Thinkpad T490s
-CPU Core I5 - Ram 8Gb
-Cache information (in bytes)
+
+- Lenovo Thinkpad T490s
+- CPU Core I5 - Ram 8Gb
+- Cache information (in bytes)
 
 ```
 LEVEL1_ICACHE_SIZE                 32768
