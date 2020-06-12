@@ -19,7 +19,7 @@ LEVEL3_CACHE_LINESIZE              64
 
 ## Benchmark result
 
-- Cacheline hit:
+- CPU Cache line hit:
 	- BenchmarkMissCacheline
 	- BenchmarkHitCacheline
 - False sharing: 
