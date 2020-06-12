@@ -2,6 +2,7 @@ package lockfree
 
 import (
 	"errors"
+	"sync"
 	"sync/atomic"
 	"unsafe"
 )
@@ -13,15 +14,20 @@ type Node struct {
 
 // Normal stack functions
 type Stack struct {
+	mutex sync.Mutex
 	head *Node
 }
 
 func (s *Stack) push(val int) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 	newNode := &Node{value: val, next: s.head}
 	s.head = newNode
 }
 
 func (s *Stack) pop() (int, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 	if s.head == nil {
 		return -1, errors.New("Stack is empty, can't pop")
 	}
