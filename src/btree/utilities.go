@@ -6,7 +6,7 @@ import (
 )
 
 func arrayToString(a []int) string {
-	return strings.Trim(strings.Replace(fmt.Sprint(a), " ", ",", -1), "[]")
+	return strings.Replace(fmt.Sprint(a), " ", ",", -1)
 }
 
 func insertInt(slice []int, index int, newElement int) []int {
@@ -27,6 +27,10 @@ func removeInterface(slice []interface{}, index int) []interface{} {
 
 func newLeafNode(keys []int, values []int, parent *InternalNode) *LeafNode {
 	return &LeafNode{keys: keys, values: values, parent: parent}
+}
+
+func newInternalNode(keys []int, children []interface{}) *InternalNode {
+	return &InternalNode{keys: keys, children: children}
 }
 
 func newBPlusTree(degree int) *BPlusTree {
