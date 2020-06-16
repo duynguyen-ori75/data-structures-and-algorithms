@@ -3,6 +3,7 @@ package btree
 import (
 	"errors"
 	"fmt"
+	//"log"
 	"sort"
 )
 
@@ -21,16 +22,17 @@ func (leaf LeafNode) Search(key int) ([]int, error) {
 	return result, nil
 }
 
-func (leaf LeafNode) Insert(key int, value int, degree int) error {
+func (leaf *LeafNode) Insert(key int, value int, degree int) error {
 	index := sort.SearchInts(leaf.keys, key)
 	leaf.keys, leaf.values = insertInt(leaf.keys, index, key), insertInt(leaf.values, index, value)
 	// number of keys is still lower than the maximum number
-	if len(leaf.keys) <= 2*degree-1 {
+	if len(leaf.keys) < degree {
 		return nil
 	}
+	numberOfKeys := degree / 2
 	// otherwise, split the LeafNode and create new InternalNode
-	rightSibling := &LeafNode{keys: leaf.keys[degree:], values: leaf.values[degree:], rightSibling: leaf.rightSibling, parent: leaf.parent}
-	leaf.rightSibling, leaf.keys, leaf.values = rightSibling, leaf.keys[:degree], leaf.values[:degree]
+	rightSibling := newLeafNode(leaf.keys[numberOfKeys:], leaf.values[numberOfKeys:], leaf.parent, leaf.rightSibling)
+	leaf.rightSibling, leaf.keys, leaf.values = rightSibling, leaf.keys[:numberOfKeys], leaf.values[:numberOfKeys]
 	// if parent node is nil -> create new parent node
 	if leaf.parent == nil {
 		parent := newInternalNode([]int{rightSibling.keys[0]}, []interface{}{leaf, rightSibling})
