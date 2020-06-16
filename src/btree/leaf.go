@@ -52,7 +52,7 @@ func (leaf *LeafNode) Delete(key int, degree int) error {
 		return fmt.Errorf("Key %d not found", key)
 	}
 	leaf.keys, leaf.values = removeInt(leaf.keys, index), removeInt(leaf.values, index)
-	// if len(leaf.keys) == 0 -> delete corresponding key in parent and self-destruct
+	// scenario 1: if len(leaf.keys) == 0 -> delete corresponding key in parent and self-destruct
 	if len(leaf.keys) == 0 {
 		if leaf.leftSibling != nil {
 			leaf.leftSibling.rightSibling = leaf.rightSibling
@@ -67,6 +67,7 @@ func (leaf *LeafNode) Delete(key int, degree int) error {
 		return nil
 	}
 	numberOfKeys := degree / 2
+	// scenario 2:
 	// number of keys is higher than the minimum degree
 	// or this leaf node does not have a right sibling to either borrow a key or to be merged with it
 	if len(leaf.keys) >= numberOfKeys || leaf.rightSibling == nil {
@@ -79,7 +80,7 @@ func (leaf *LeafNode) Delete(key int, degree int) error {
 	}
 	rightSibling := leaf.rightSibling
 	borrowedKey := rightSibling.keys[0]
-	// borrow a key of right sibling if it has enough keys
+	// scenario 3: borrow a key of right sibling if it has enough keys
 	if len(rightSibling.keys) > numberOfKeys {
 		leaf.keys, rightSibling.keys = append(leaf.keys, borrowedKey), removeInt(rightSibling.keys, 0)
 		leaf.values, rightSibling.values = append(leaf.values, rightSibling.values[0]), removeInt(rightSibling.values, 0)
@@ -89,9 +90,8 @@ func (leaf *LeafNode) Delete(key int, degree int) error {
 		leaf.parent.keys[parentIndex] = rightSibling.keys[0]
 		return nil
 	}
-	// otherwise, merge this leaf node with its sibling
+	// scenario 4: merge this leaf node with its sibling, then rebalance the parent node
 	leaf.rightSibling, leaf.keys, leaf.values =
 		rightSibling.rightSibling, append(leaf.keys, rightSibling.keys...), append(leaf.values, rightSibling.values...)
-	// rebalance the parent node
 	return leaf.parent.Delete(key, degree)
 }
