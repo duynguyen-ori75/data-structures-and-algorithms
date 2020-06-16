@@ -3,6 +3,7 @@ package btree
 type LeafNode struct {
 	keys         []int
 	values       []int
+	leftSibling  *LeafNode
 	rightSibling *LeafNode
 	parent       *InternalNode
 }
