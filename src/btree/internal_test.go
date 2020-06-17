@@ -7,7 +7,7 @@ import (
 )
 
 /**
- * @brief      initialize InternalNode with the following structure
+ * @brief      initialize InternalNode with the following structure, should works with degree 3
  *
  * 				   5
  * 			   /      \
