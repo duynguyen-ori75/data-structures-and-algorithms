@@ -3,7 +3,6 @@ package btree
 import (
 	//"log"
 	//"reflect"
-	"fmt"
 	"testing"
 )
 
@@ -12,17 +11,17 @@ import (
  *
  * 				   5
  * 			   /      \
- * 			 3          8
- * 		   /   \      /   \
- * 		  1   4,5   6,7   10
+ * 			 4          10
+ * 		   /   \      /    \
+ * 		  1   4,5   6,7    10
  *
  * @return     the parent InternalNode and the maximum degree of BTree
  */
 func newTestInternalNode() (*InternalNode, int) {
 	// initialize top-most InternalNode and its children (two InternalNodes)
 	parent, degree := newInternalNode([]int{5}, []interface{}{
-		newInternalNode([]int{3}, nil),
-		newInternalNode([]int{8}, nil),
+		newInternalNode([]int{4}, nil),
+		newInternalNode([]int{10}, nil),
 	}), 3
 	leftChild, rightChild := parent.children[0].(*InternalNode), parent.children[1].(*InternalNode)
 	leftChild.parent, rightChild.parent = parent, parent
@@ -56,14 +55,30 @@ func TestInternalNode_Search(t *testing.T) {
 		t.Error("Should not raise exception here")
 	}
 	if leaf != node.children[0].(*InternalNode).children[1] {
-		fmt.Errorf("The internal node does not give correct leaf node. Expected leaf node [4,5] - get %s", arrayToString(leaf.keys))
+		t.Errorf("The internal node does not give correct leaf node. Expected leaf node [4,5] - get %s", arrayToString(leaf.keys))
 	}
-	leaf, err = node.Search(8)
+
+	leaf, err = node.Search(9)
 	if err != nil {
 		t.Error("Should not raise exception here")
 	}
 	if leaf != node.children[1].(*InternalNode).children[0] {
-		fmt.Errorf("The internal node does not give correct leaf node. Expected leaf node [6,7] - get %s", arrayToString(leaf.keys))
+		t.Errorf("The internal node does not give correct leaf node. Expected leaf node [6,7] - get %s", arrayToString(leaf.keys))
 	}
 
+	leaf, err = node.Search(10)
+	if err != nil {
+		t.Error("Should not raise exception here")
+	}
+	if leaf != node.children[1].(*InternalNode).children[1] {
+		t.Errorf("The internal node does not give correct leaf node. Expected leaf node [10] - get %s", arrayToString(leaf.keys))
+	}
 }
+
+/**
+func TestInternalNode_Insert(t *testing.T) {
+	node, degree := newTestInternalNode()
+
+
+}
+*/

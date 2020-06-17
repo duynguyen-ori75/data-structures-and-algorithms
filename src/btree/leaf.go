@@ -7,19 +7,15 @@ import (
 	"sort"
 )
 
-func (leaf LeafNode) Search(key int) ([]int, error) {
+func (leaf LeafNode) Search(key int) (int, error) {
 	if len(leaf.keys) != len(leaf.values) {
-		return nil, errors.New("LeafNode's keys and values should have similar number of items")
+		return -1, errors.New("LeafNode's keys and values should have similar number of items")
 	}
 	index := sort.SearchInts(leaf.keys, key)
 	if index == len(leaf.keys) || leaf.keys[index] != key {
-		return nil, errors.New(fmt.Sprintf("Key %d not found", key))
+		return -1, errors.New(fmt.Sprintf("Key %d not found", key))
 	}
-	var result []int
-	for ; leaf.keys[index] == key; index++ {
-		result = append(result, leaf.values[index])
-	}
-	return result, nil
+	return leaf.values[index], nil
 }
 
 func (leaf *LeafNode) Insert(key int, value int, degree int) error {
@@ -32,8 +28,8 @@ func (leaf *LeafNode) Insert(key int, value int, degree int) error {
 	if len(leaf.keys) < degree {
 		return nil
 	}
-	numberOfKeys := degree / 2
 	// otherwise, split the LeafNode and create new InternalNode
+	numberOfKeys := degree / 2
 	rightSibling := newLeafNode(leaf.keys[numberOfKeys:], leaf.values[numberOfKeys:], leaf, leaf.rightSibling, leaf.parent)
 	leaf.rightSibling, leaf.keys, leaf.values = rightSibling, leaf.keys[:numberOfKeys], leaf.values[:numberOfKeys]
 	// if parent node is nil -> create new parent node

@@ -7,7 +7,7 @@ import (
 )
 
 func TestLeafNode_Search(t *testing.T) {
-	leaf := newLeafNode([]int{1, 4, 4, 4, 4, 7, 8}, []int{4, 5, 7, 2, 3, 1, 5}, nil, nil, nil)
+	leaf := newLeafNode([]int{1, 4, 7, 8}, []int{4, 5, 1, 5}, nil, nil, nil)
 	val, err := leaf.Search(2)
 	if err == nil {
 		t.Error("Search for non-existant key should return error")
@@ -16,8 +16,8 @@ func TestLeafNode_Search(t *testing.T) {
 	if err != nil {
 		t.Error("Search of existing key should be good")
 	}
-	if !reflect.DeepEqual(val, []int{5, 7, 2, 3}) {
-		t.Errorf("Expected array should be %s instead of %s", arrayToString([]int{5, 7, 2, 3}), arrayToString(val))
+	if val != 5 {
+		t.Errorf("Expected result should be 5 instead of %d", val)
 	}
 }
 
