@@ -2,7 +2,7 @@ package btree
 
 import (
 	//"log"
-	//"reflect"
+	"reflect"
 	"testing"
 )
 
@@ -75,10 +75,70 @@ func TestInternalNode_Search(t *testing.T) {
 	}
 }
 
-/**
 func TestInternalNode_Insert(t *testing.T) {
-	node, degree := newTestInternalNode()
+	node, degree := newInternalNode([]int{}, []interface{}{2}), 3
 
+	err := node.Insert(3, 4, degree)
+	if err != nil {
+		t.Error("Should not raise exception here")
+	}
+	err = node.Insert(3, 10, degree)
+	if err == nil {
+		t.Error("Should raise exception here")
+	}
 
+	err = node.Insert(1, 5, degree)
+	if err != nil {
+		t.Error("Should not raise exception here")
+	}
+	if !reflect.DeepEqual(node.keys, []int{1, 3}) {
+		t.Errorf("Expected keys are [1, 3], get %s", arrayToString(node.keys))
+	}
+	if !reflect.DeepEqual(node.children, []interface{}{2, 5, 4}) {
+		t.Errorf("Expected children are [5, 4], get %s", arrayToString(node.keys))
+	}
+
+	err = node.Insert(7, 12, degree)
+	if err != nil {
+		t.Error("Should not raise exception here")
+	}
+	if node.parent == nil {
+		t.Error("New parent node should be created")
+	}
+	if !reflect.DeepEqual(node.keys, []int{1}) {
+		t.Errorf("Expected keys are [1], get %s", arrayToString(node.keys))
+	}
+	if !reflect.DeepEqual(node.parent.keys, []int{3}) {
+		t.Errorf("Expected keys are [3], get %s", arrayToString(node.parent.keys))
+	}
+	rightSibling := node.parent.children[1].(*InternalNode)
+	if !reflect.DeepEqual(rightSibling.keys, []int{7}) {
+		t.Errorf("Expected keys are [7], get %s", arrayToString(rightSibling.keys))
+	}
+	if node.parent != rightSibling.parent {
+		t.Error("Two internal nodes should have the same parent node")
+	}
+
+	err = rightSibling.Insert(4, 1, degree)
+	if err != nil {
+		t.Error("Should not raise exception here")
+	}
+	if !reflect.DeepEqual(rightSibling.keys, []int{4, 7}) {
+		t.Errorf("Expected keys are [4, 7], get %s", arrayToString(rightSibling.keys))
+	}
+
+	err = rightSibling.Insert(8, 4, degree)
+	if err != nil {
+		t.Error("Should not raise exception here")
+	}
+	if !reflect.DeepEqual(rightSibling.keys, []int{4}) {
+		t.Errorf("Expected keys are [4], get %s", arrayToString(rightSibling.keys))
+	}
+	if !reflect.DeepEqual(rightSibling.parent.keys, []int{3, 7}) {
+		t.Errorf("Expected keys are [3, 7], get %s", arrayToString(rightSibling.keys))
+	}
+	rightMostSib := node.parent.children[2].(*InternalNode)
+	if !reflect.DeepEqual(rightMostSib.keys, []int{8}) {
+		t.Errorf("Expected keys are [8], get %s", arrayToString(rightMostSib.keys))
+	}
 }
-*/

@@ -7,10 +7,18 @@ import (
 	"sort"
 )
 
-func (node InternalNode) Search(key int) (*LeafNode, error) {
-	log.Printf("DFS to node %s\n", arrayToString(node.keys))
+func (node InternalNode) validation() error {
+	//log.Printf("DFS to node %s\n", arrayToString(node.keys))
 	if len(node.keys)+1 != len(node.children) {
-		return nil, fmt.Errorf("There is an internal node in failed state: %d keys and %d children", len(node.keys), len(node.children))
+		return fmt.Errorf("There is an internal node in failed state: %d keys and %d children", len(node.keys), len(node.children))
+	}
+	return nil
+}
+
+func (node InternalNode) Search(key int) (*LeafNode, error) {
+	err := node.validation()
+	if err != nil {
+		return nil, err
 	}
 	chosenIndex := sort.SearchInts(node.keys, key+1)
 	switch child := node.children[chosenIndex].(type) {
@@ -24,11 +32,15 @@ func (node InternalNode) Search(key int) (*LeafNode, error) {
 }
 
 func (node *InternalNode) Insert(key int, newChild interface{}, degree int) error {
+	err := node.validation()
+	if err != nil {
+		return err
+	}
 	index := sort.SearchInts(node.keys, key)
 	if index < len(node.keys) && node.keys[index] == key {
 		return fmt.Errorf("InternalNode: All keys should be unique. Try to insert %d into %s", key, arrayToString(node.keys))
 	}
-	node.keys, node.children = insertInt(node.keys, index, key), insertInterface(node.children, index, newChild)
+	node.keys, node.children = insertInt(node.keys, index, key), insertInterface(node.children, index+1, newChild)
 	// number of keys is still lower than the maximum number
 	if len(node.keys) < degree {
 		return nil
@@ -40,7 +52,7 @@ func (node *InternalNode) Insert(key int, newChild interface{}, degree int) erro
 	node.keys, node.children = node.keys[:numberOfKeys], node.children[:numberOfKeys+1]
 	// if parent is nil -> this internal node is the top-most node -> create new internal node on top of it
 	if node.parent == nil {
-		node.parent = newInternalNode([]int{}, []interface{}{})
+		node.parent = newInternalNode([]int{}, []interface{}{node})
 	}
 	rightSibl.parent = node.parent
 	return node.parent.Insert(moveUpKey, rightSibl, degree)
