@@ -9,10 +9,9 @@ type LeafNode struct {
 }
 
 type InternalNode struct {
-	keys         []int
-	children     []interface{}
-	rightSibling *InternalNode
-	parent       *InternalNode
+	keys     []int
+	children []interface{}
+	parent   *InternalNode
 }
 
 type BPlusTree struct {

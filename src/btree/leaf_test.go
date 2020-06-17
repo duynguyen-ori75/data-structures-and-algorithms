@@ -1,12 +1,12 @@
 package btree
 
 import (
-	"log"
+	//"log"
 	"reflect"
 	"testing"
 )
 
-func TestSearch(t *testing.T) {
+func TestLeafNode_Search(t *testing.T) {
 	leaf := newLeafNode([]int{1, 4, 4, 4, 4, 7, 8}, []int{4, 5, 7, 2, 3, 1, 5}, nil, nil, nil)
 	val, err := leaf.Search(2)
 	if err == nil {
@@ -21,9 +21,8 @@ func TestSearch(t *testing.T) {
 	}
 }
 
-func TestInsert(t *testing.T) {
+func TestLeafNode_Insert(t *testing.T) {
 	leaf, degree := newLeafNode([]int{}, []int{}, nil, nil, nil), 3
-	log.Printf("Inserting with degree %d\n", degree)
 	if leaf.Insert(1, 2, degree) != nil {
 		t.Error("Insert (1, 2) should not raise exception")
 	}
@@ -53,7 +52,7 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestLeafNode_Delete(t *testing.T) {
 	// initialize test
 	parent, degree := newInternalNode([]int{5}, nil), 4
 	sibling := newLeafNode([]int{5, 8, 10}, []int{9, 4, 5}, nil, nil, parent)
