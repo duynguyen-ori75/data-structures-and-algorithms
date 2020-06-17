@@ -1,10 +1,10 @@
-## Random stuffs for training golang
+# Random stuffs for training golang and computer science
 
 > You probably want to add this to your GOPATH env
 
-### WIP:
+## WIP:
+- B+Tree (re-implement - with intensive tests for correctness)
 
-### Planned:
+## Planned:
 - Download files from http 1.1 - IDM-like method
 - Implement lock-free queue
-- Add benchmark for lock-free data structures
