@@ -20,3 +20,4 @@ I am happy to receive any PR and issue if you find one
 - Download files from HTTP 1.1 - IDM-like method
 - Implement lock-free queue
 - Log-structured Merge tree
+- Consistent hashing

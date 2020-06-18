@@ -13,7 +13,7 @@ import (
  * 			   /      \
  * 			 4          10
  * 		   /   \      /    \
- * 		  1   4,5   6,7    10
+ * 		  1   4,5   7,8    10
  *
  * @return     the parent InternalNode and the maximum degree of BTree
  */
@@ -36,7 +36,7 @@ func newTestInternalNode() (*InternalNode, int) {
 
 	// initialize right child
 	rightChild.children = []interface{}{
-		newLeafNode([]int{6, 7}, []int{5, 1}, nil, nil, rightChild),
+		newLeafNode([]int{7, 8}, []int{5, 1}, nil, nil, rightChild),
 		newLeafNode([]int{10}, []int{1}, nil, nil, rightChild),
 	}
 	rightChild.children[0].(*LeafNode).rightSibling, rightChild.children[1].(*LeafNode).leftSibling =

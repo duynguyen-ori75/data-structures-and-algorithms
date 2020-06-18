@@ -59,6 +59,14 @@ func (node *InternalNode) Insert(key int, newChild interface{}, degree int) erro
 }
 
 func (node *InternalNode) Delete(key int, degree int) error {
+	err := node.validation()
+	if err != nil {
+		return err
+	}
+	index := sort.SearchInts(node.keys, key)
+	if index == len(node.keys) || node.keys[index] != key {
+		return fmt.Errorf("InternalNode: Can't delete key %d in node %s", key, arrayToString(node.keys))
+	}
 	log.Println("InternalNode - Delete", key, degree)
 	return nil
 }
