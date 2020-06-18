@@ -2,7 +2,7 @@ package btree
 
 import (
 	"fmt"
-	"log"
+	//"log"
 	"reflect"
 	"sort"
 )
@@ -67,6 +67,30 @@ func (node *InternalNode) Delete(key int, degree int) error {
 	if index == len(node.keys) || node.keys[index] != key {
 		return fmt.Errorf("InternalNode: Can't delete key %d in node %s", key, arrayToString(node.keys))
 	}
-	log.Println("InternalNode - Delete", key, degree)
+	node.keys, node.children = removeInt(node.keys, index), removeInterface(node.children, index+1)
+	// validate number of keys - should be not lower than the min degree (max degree / 2)
+	if len(node.keys) >= degree/2 || node.parent == nil {
+		return nil
+	}
+	/**
+	 * Otherwise, there are two cases:
+	 * - len(currentNode + rightSibling + 1) < degree  // 1 here mean the corresponding key in parent node
+	 * - rotate key and child (node borrows key from parent, and the parent borrows a key from rightSibl)
+	 */
+	childIndex := sort.SearchInts(node.parent.keys, key)
+	rightSibl := node.parent.children[childIndex+1].(*InternalNode)
+	if len(node.keys)+len(rightSibl.keys)+1 < degree {
+		node.keys = append(node.keys, node.parent.keys[childIndex])
+		node.keys = append(node.keys, rightSibl.keys...)
+		node.children = append(node.children, rightSibl.children...)
+		return node.parent.Delete(childIndex, degree)
+	}
+	// scenario 3
+	// update node.keys first
+	node.keys, node.children = append(node.keys, node.parent.keys[childIndex]), append(node.children, rightSibl.children[0])
+	// update respective key in node.parent
+	node.parent.keys[childIndex] = rightSibl.keys[0]
+	// delete first entry of right sibling
+	rightSibl.keys, rightSibl.children = removeInt(rightSibl.keys, 0), removeInterface(rightSibl.children, 0)
 	return nil
 }

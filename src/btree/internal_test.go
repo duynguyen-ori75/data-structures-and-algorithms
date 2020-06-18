@@ -46,6 +46,48 @@ func newTestInternalNode() (*InternalNode, int) {
 	return parent, degree
 }
 
+/**
+ * @brief      Will create the following structure. All nodes are InternalNode
+ *
+ *                    6
+ *                 /     \
+ *               3        9
+ *             /   \    /   \
+ *           1,2   5   8   11,15
+ *
+ * @return     The top-most internal node and the maximum degree of the tree
+ */
+func newTestInternalNode_version2() (*InternalNode, int) {
+	// initialize top-most InternalNode and its children (two InternalNodes)
+	parent, degree := newInternalNode([]int{6}, []interface{}{
+		newInternalNode([]int{3}, nil),
+		newInternalNode([]int{9}, nil),
+	}), 3
+	leftChild, rightChild := parent.children[0].(*InternalNode), parent.children[1].(*InternalNode)
+	leftChild.parent, rightChild.parent = parent, parent
+
+	// initialize left child
+	leftChild.children = []interface{}{
+		newInternalNode([]int{1}, []interface{}{2, 7}),
+		newInternalNode([]int{5}, []interface{}{5, 2}),
+	}
+	for _, child := range leftChild.children {
+		child.(*InternalNode).parent = leftChild
+	}
+
+	// initialize right child
+	rightChild.children = []interface{}{
+		newInternalNode([]int{8}, []interface{}{3, 10}),
+		newInternalNode([]int{11, 15}, []interface{}{2, 4, 12}),
+	}
+	for _, child := range rightChild.children {
+		child.(*InternalNode).parent = rightChild
+	}
+
+	// return data
+	return parent, degree
+}
+
 func TestInternalNode_Search(t *testing.T) {
 	// initialize test
 	node, _ := newTestInternalNode()
@@ -140,5 +182,40 @@ func TestInternalNode_Insert(t *testing.T) {
 	rightMostSib := node.parent.children[2].(*InternalNode)
 	if !reflect.DeepEqual(rightMostSib.keys, []int{8}) {
 		t.Errorf("Expected keys are [8], get %s", arrayToString(rightMostSib.keys))
+	}
+}
+
+func TestInternalNode_Delete(t *testing.T) {
+	// initialize test
+	node, degree := newTestInternalNode_version2()
+	leftChild, rightChild := node.children[0].(*InternalNode), node.children[1].(*InternalNode)
+
+	err := rightChild.children[0].(*InternalNode).Delete(8, degree)
+	if err != nil {
+		t.Errorf("Should not raise exception here. Meet: %s", err)
+	}
+	if !reflect.DeepEqual(rightChild.keys, []int{11}) {
+		t.Errorf("Expected key of right child are [11], get %s", arrayToString(rightChild.keys))
+	}
+	if !reflect.DeepEqual(rightChild.children[0].(*InternalNode).keys, []int{9}) {
+		t.Errorf("Expected key of right child's left grand-child are [9], get %s",
+			arrayToString(rightChild.children[0].(*InternalNode).keys))
+	}
+	if !reflect.DeepEqual(rightChild.children[0].(*InternalNode).children, []interface{}{3, 2}) {
+		t.Errorf("Expected values of right child's left grand-child are [3, 2], get %s",
+			interfacesToString(rightChild.children[0].(*InternalNode).children))
+	}
+
+	err = leftChild.children[0].(*InternalNode).Delete(1, degree)
+	if err != nil {
+		t.Errorf("Should not raise exception here. Meet: %s", err)
+	}
+	if !reflect.DeepEqual(leftChild.keys, []int{6, 9}) {
+		t.Errorf("Expected values of right child's left grand-child are [6, 9], get %s",
+			arrayToString(leftChild.keys))
+	}
+	if !reflect.DeepEqual(leftChild.children[0].(*InternalNode).keys, []int{3}) {
+		t.Errorf("Expected values of right child's left grand-child are [3], get %s",
+			arrayToString(leftChild.keys))
 	}
 }

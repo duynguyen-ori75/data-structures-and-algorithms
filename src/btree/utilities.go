@@ -9,6 +9,10 @@ func arrayToString(a []int) string {
 	return strings.Replace(fmt.Sprint(a), " ", ",", -1)
 }
 
+func interfacesToString(a []interface{}) string {
+	return strings.Replace(fmt.Sprint(a), " ", ",", -1)
+}
+
 func insertInt(slice []int, index int, newElement int) []int {
 	return append(slice[:index], append([]int{newElement}, slice[index:]...)...)
 }

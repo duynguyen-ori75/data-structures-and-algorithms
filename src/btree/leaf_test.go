@@ -57,6 +57,7 @@ func TestLeafNode_Delete(t *testing.T) {
 	parent, degree := newInternalNode([]int{5}, nil), 4
 	sibling := newLeafNode([]int{5, 8, 10}, []int{9, 4, 5}, nil, nil, parent)
 	leaf := newLeafNode([]int{1, 3, 4}, []int{5, 3, 12}, nil, sibling, parent)
+	parent.children = append(parent.children, leaf, sibling)
 	sibling.leftSibling = leaf
 
 	// start testing
@@ -88,7 +89,7 @@ func TestLeafNode_Delete(t *testing.T) {
 
 	err = leaf.Delete(5, degree)
 	if err != nil {
-		t.Error("Delete existing key should be fine")
+		t.Errorf("Delete existing key should be fine. Meet: %s", err)
 	}
 	if leaf.rightSibling != nil {
 		t.Error("Two leaf nodes should be merged into one now")

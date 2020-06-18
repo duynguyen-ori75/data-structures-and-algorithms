@@ -3,7 +3,7 @@ package btree
 import (
 	"errors"
 	"fmt"
-	"log"
+	//"log"
 	"sort"
 )
 
@@ -82,12 +82,11 @@ func (leaf *LeafNode) Delete(key int, degree int) error {
 		leaf.values, rightSibling.values = append(leaf.values, rightSibling.values[0]), removeInt(rightSibling.values, 0)
 		// update the corresponding key in the parent node
 		parentIndex := sort.SearchInts(leaf.parent.keys, borrowedKey)
-		log.Printf("Parent's keys: %s - try to delete key %d at index %d", arrayToString(leaf.parent.keys), borrowedKey, parentIndex)
 		leaf.parent.keys[parentIndex] = rightSibling.keys[0]
 		return nil
 	}
 	// scenario 4: merge this leaf node with its sibling, then rebalance the parent node
 	leaf.rightSibling, leaf.keys, leaf.values =
 		rightSibling.rightSibling, append(leaf.keys, rightSibling.keys...), append(leaf.values, rightSibling.values...)
-	return leaf.parent.Delete(key, degree)
+	return leaf.parent.Delete(borrowedKey, degree)
 }
