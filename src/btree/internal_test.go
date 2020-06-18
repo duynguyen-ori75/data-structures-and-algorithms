@@ -53,7 +53,7 @@ func newTestInternalNode() (*InternalNode, int) {
  *                 /     \
  *               3        9
  *             /   \    /   \
- *           1,2   5   8   11,15
+ *            1     5  8   11,15
  *
  * @return     The top-most internal node and the maximum degree of the tree
  */
@@ -210,12 +210,15 @@ func TestInternalNode_Delete(t *testing.T) {
 	if err != nil {
 		t.Errorf("Should not raise exception here. Meet: %s", err)
 	}
-	if !reflect.DeepEqual(leftChild.keys, []int{6, 9}) {
-		t.Errorf("Expected values of right child's left grand-child are [6, 9], get %s",
-			arrayToString(leftChild.keys))
+	if !reflect.DeepEqual(leftChild.keys, []int{6, 11}) {
+		t.Errorf("Expected keys of left child are [6, 11], get %s", arrayToString(leftChild.keys))
 	}
-	if !reflect.DeepEqual(leftChild.children[0].(*InternalNode).keys, []int{3}) {
-		t.Errorf("Expected values of right child's left grand-child are [3], get %s",
-			arrayToString(leftChild.keys))
+	if !reflect.DeepEqual(leftChild.children[0].(*InternalNode).keys, []int{3, 5}) {
+		t.Errorf("Expected keys of left child's left grand-child are [3, 5], get %s",
+			arrayToString(leftChild.children[0].(*InternalNode).keys))
+	}
+	if !reflect.DeepEqual(leftChild.children[0].(*InternalNode).children, []interface{}{2, 5, 2}) {
+		t.Errorf("Expected values of left child's left grand-child are [2, 5, 2], get %s",
+			interfacesToString(leftChild.children[0].(*InternalNode).children))
 	}
 }

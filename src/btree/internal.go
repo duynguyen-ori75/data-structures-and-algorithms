@@ -83,7 +83,7 @@ func (node *InternalNode) Delete(key int, degree int) error {
 		node.keys = append(node.keys, node.parent.keys[childIndex])
 		node.keys = append(node.keys, rightSibl.keys...)
 		node.children = append(node.children, rightSibl.children...)
-		return node.parent.Delete(childIndex, degree)
+		return node.parent.Delete(node.parent.keys[childIndex], degree)
 	}
 	// scenario 3
 	// update node.keys first
