@@ -12,12 +12,12 @@ I am happy to receive any PR and issue if you find one
 - LRU Cache
 - SSTable (very simple implementation)
 - Skip List
+- B+Tree
 
 ## WIP:
-- B+Tree (re-implement - with intensive tests for correctness)
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method
-- Implement lock-free queue
+- Lock-free queue
 - Log-structured Merge tree
 - Consistent hashing
