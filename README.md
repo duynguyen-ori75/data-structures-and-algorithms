@@ -15,9 +15,10 @@ I am happy to receive any PR and issue if you find one
 - B+Tree
 
 ## WIP:
+- Consistent hashing
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method
 - Lock-free queue
 - Log-structured Merge tree
-- Consistent hashing
+- External Sort
