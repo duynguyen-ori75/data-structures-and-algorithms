@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"hash"
 	"hash/crc32"
-	"rand"
+	"math/rand"
+	"reflect"
 	"sort"
 )
 
@@ -14,7 +15,7 @@ import (
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 const nameLength = 10
 
-func randomString(length int) {
+func randomString(length int) string {
 	b := make([]byte, length)
 	for i := range b {
 		b[i] = charset[rand.Intn(len(charset))]
@@ -28,6 +29,7 @@ func randomString(length int) {
 type NodeConfig struct {
 	nodeNames []string
 	hashFunc  hash.Hash32
+	network   *ClusterInfras
 }
 
 type Node struct {
@@ -40,13 +42,21 @@ func NewNode(name string, config NodeConfig) *Node {
 	return &Node{name: name, kvstore: make(map[int]int), config: config}
 }
 
-func (node Node) Receive(senderName string, message string) error {
+func (node Node) Send(receiverName string, message interface{}) error {
+	return node.config.network.SendMessage(node.name, receiverName, message)
+}
+
+func (node Node) Receive(senderName string, message interface{}) error {
 	fmt.Printf("Receiving from %s - message %s\n", senderName, message)
+	switch rpc := message.(type) {
+	default:
+		return fmt.Errorf("Can't decode the message - its type is '%s'", reflect.TypeOf(rpc).String())
+	}
 	return nil
 }
 
 /**
- * Infrastructure information
+ * Infrastructure information - contains abstract functions to simulate network behavior
  */
 type ClusterInfras struct {
 	nodes []*Node
@@ -57,7 +67,7 @@ type ClusterInfras struct {
 func NewInfras(numberOfNodes int) ClusterInfras {
 	var infras ClusterInfras
 	// initialize share node config
-	nodeConfig := NodeConfig{hashFunc: crc32.NewIEEE()}
+	nodeConfig := NodeConfig{hashFunc: crc32.NewIEEE(), network: &infras}
 	for index := 0; index < numberOfNodes; index++ {
 		nodeConfig.nodeNames = append(nodeConfig.nodeNames, randomString(nameLength))
 	}
@@ -74,7 +84,7 @@ func NewInfras(numberOfNodes int) ClusterInfras {
 	return infras
 }
 
-func (infras *ClusterInfras) SendMessage(senderName string, receiverName string, message string) error {
+func (infras *ClusterInfras) SendMessage(senderName string, receiverName string, message interface{}) error {
 	senderIdx := sort.Search(len(infras.nodes), func(index int) bool {
 		return infras.nodes[index].name >= senderName
 	})
