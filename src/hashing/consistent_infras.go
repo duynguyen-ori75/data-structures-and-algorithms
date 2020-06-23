@@ -32,7 +32,6 @@ func (node Node) ConsistentHash(key string) int {
 }
 
 func (node Node) Receive(senderName string, message interface{}) interface{} {
-	fmt.Printf("Receiving from %s - message %s\n", senderName, message)
 	switch request := message.(type) {
 	case ReadRequest:
 		return node.Read(request)
@@ -63,8 +62,10 @@ func NewInfras(numberOfNodes int) (*ClusterInfras, error) {
 	for index := 0; index < numberOfNodes; index++ {
 		nodeConfig.nodeNames = append(nodeConfig.nodeNames, randomString())
 	}
-	sort.Strings(nodeConfig.nodeNames)
-	// initialize nodes and the cluster
+	sort.Slice(nodeConfig.nodeNames, func(i, j int) bool {
+		return hashSum(nodeConfig.nodeNames[i]) <= hashSum(nodeConfig.nodeNames[j])
+	})
+	// initialize nodes in the cluster - and sort them in asc order (easy to test)
 	for _, nodeName := range nodeConfig.nodeNames {
 		infras.nodes = append(infras.nodes, NewNode(nodeName, nodeConfig))
 	}

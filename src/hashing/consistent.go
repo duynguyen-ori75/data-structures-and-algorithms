@@ -1,5 +1,7 @@
 package hashing
 
+import "fmt"
+
 /**
  * All RPC structs definition
  */
@@ -33,6 +35,9 @@ func (node Node) Read(request ReadRequest) ReadResponse {
 		return ReadResponse{value: val, err: nil}
 	}
 	expectedNodeIndex := node.ConsistentHash(request.key)
+	if node.name == node.config.nodeNames[expectedNodeIndex] {
+		return ReadResponse{err: fmt.Errorf("Key %s does not exist", request.key)}
+	}
 	response := node.config.network.SendMessage(node.name, node.config.nodeNames[expectedNodeIndex], request)
 	if readResp, ok := response.(ReadResponse); ok {
 		return readResp
@@ -47,12 +52,12 @@ func (node Node) Read(request ReadRequest) ReadResponse {
  *
  * @return     The write response from the cluster
  */
-func (node Node) Write(request WriteRequest) WriteResponse {
-	if _, ok := node.kvstore[request.key]; ok {
+func (node *Node) Write(request WriteRequest) WriteResponse {
+	expectedNodeIndex := node.ConsistentHash(request.key)
+	if node.name == node.config.nodeNames[expectedNodeIndex] {
 		node.kvstore[request.key] = request.value
 		return WriteResponse{err: nil}
 	}
-	expectedNodeIndex := node.ConsistentHash(request.key)
 	response := node.config.network.SendMessage(node.name, node.config.nodeNames[expectedNodeIndex], request)
 	if writeResp, ok := response.(WriteResponse); ok {
 		return writeResp
