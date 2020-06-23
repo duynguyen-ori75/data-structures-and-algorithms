@@ -13,9 +13,9 @@ Many thanks!
 - [Lock-free stack](src/lockfree/README.md)
 - [LRU Cache](https://leetcode.com/problems/lru-cache/)
 - [SSTable](src/lsm/README.md)
-- Skip List
-- B+Tree
-- Consistent hashing
+- [Skip List](src/skiplist/README.md)
+- [B+Tree](src/btree/README.md)
+- [Consistent hashing](src/hashing/README.md)
 
 ## WIP:
 
