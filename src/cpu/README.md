@@ -1,6 +1,6 @@
 # Cache benchmark information
 
-## Machine info
+## Machine info:
 
 - Lenovo Thinkpad T490s
 - CPU Core I5 - Ram 8Gb
@@ -17,7 +17,7 @@ LEVEL3_CACHE_SIZE                  6291456
 LEVEL3_CACHE_LINESIZE              64
 ```
 
-## Benchmark result
+## Benchmark result:
 
 - CPU Cache line hit:
 	- BenchmarkMissCacheline
@@ -36,3 +36,9 @@ BenchmarkPaddingStruct-8   	     438	   2668565 ns/op
 PASS
 ok  	_/home/duynguyen/Workplace/learning/src/benchmark	9.908s
 ```
+
+## References:
+- https://en.wikipedia.org/wiki/CPU_cache
+- https://en.wikipedia.org/wiki/False_sharing
+- https://medium.com/@teivah/go-and-cpu-caches-af5d32cc5592
+- https://medium.com/@genchilu/whats-false-sharing-and-how-to-solve-it-using-golang-as-example-ef978a305e10

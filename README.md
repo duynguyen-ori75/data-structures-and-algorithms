@@ -8,16 +8,16 @@ Many thanks!
 ```
 
 ## Finish:
-- Bloom filter
-- CPU Cacheline & false-sharing benchmarks
+- [Bloom filter](src/bloom/README.md)
+- [CPU Cacheline & false-sharing benchmarks](src/cpu/README.md)
 - Lock-free stack (with benchmark)
 - LRU Cache
 - SSTable (very simple implementation)
 - Skip List
 - B+Tree
+- Consistent hashing
 
 ## WIP:
-- Consistent hashing
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method
