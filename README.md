@@ -9,10 +9,10 @@ Many thanks!
 
 ## Finish:
 - [Bloom filter](src/bloom/README.md)
-- [CPU Cacheline & false-sharing benchmarks](src/cpu/README.md)
-- Lock-free stack (with benchmark)
-- LRU Cache
-- SSTable (very simple implementation)
+- [CPU Cache line & false-sharing benchmarks](src/cpu/README.md)
+- [Lock-free stack](src/lockfree/README.md)
+- [LRU Cache](https://leetcode.com/problems/lru-cache/)
+- [SSTable](src/lsm/README.md)
 - Skip List
 - B+Tree
 - Consistent hashing
