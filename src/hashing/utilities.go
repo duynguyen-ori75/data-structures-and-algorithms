@@ -10,8 +10,8 @@ const nameLength = 10
 
 var hashFunc = crc32.NewIEEE()
 
-func randomString(length int) string {
-	b := make([]byte, length)
+func randomString() string {
+	b := make([]byte, nameLength)
 	for i := range b {
 		b[i] = charset[rand.Intn(len(charset))]
 	}

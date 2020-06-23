@@ -1,8 +1,10 @@
 # Random stuff for training Golang and computer science
 
 ```
-You probably want to add this to your GOPATH env
 I am happy to receive any PR and issue if you find one
+If you have any proposal on what I should do next, you can also create a new issue for it
+
+Many thanks!
 ```
 
 ## Finish:

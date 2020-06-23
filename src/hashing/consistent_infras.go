@@ -7,18 +7,6 @@ import (
 )
 
 /**
- * All RPC structs definition
- */
-type ReadRequest struct {
-	key string
-}
-
-type ReadResponse struct {
-	value int
-	err   error
-}
-
-/**
  * Node information
  */
 type NodeConfig struct {
@@ -43,26 +31,15 @@ func (node Node) ConsistentHash(key string) int {
 	return nodeIndex % len(node.config.nodeNames)
 }
 
-func (node Node) Send(receiverName string, message interface{}) interface{} {
-	switch rpc := message.(type) {
-	case ReadRequest:
-		response := node.config.network.SendMessage(node.name, receiverName, message)
-		if readResp, ok := response.(ReadResponse); ok {
-			return readResp
-		}
-		return ReadResponse{err: response.(error)}
-	default:
-		return fmt.Errorf("Can't decode the message - its type is '%s'", reflect.TypeOf(rpc).String())
-	}
-}
-
 func (node Node) Receive(senderName string, message interface{}) interface{} {
 	fmt.Printf("Receiving from %s - message %s\n", senderName, message)
-	switch rpc := message.(type) {
+	switch request := message.(type) {
 	case ReadRequest:
-		return node.Read(rpc)
+		return node.Read(request)
+	case WriteRequest:
+		return node.Write(request)
 	default:
-		return fmt.Errorf("Can't decode the message - its type is '%s'", reflect.TypeOf(rpc).String())
+		return fmt.Errorf("Can't decode the message - its type is '%s'", reflect.TypeOf(request).String())
 	}
 	return nil
 }
@@ -84,7 +61,7 @@ func NewInfras(numberOfNodes int) (*ClusterInfras, error) {
 	// initialize share node config
 	nodeConfig := NodeConfig{network: &infras}
 	for index := 0; index < numberOfNodes; index++ {
-		nodeConfig.nodeNames = append(nodeConfig.nodeNames, randomString(nameLength))
+		nodeConfig.nodeNames = append(nodeConfig.nodeNames, randomString())
 	}
 	sort.Strings(nodeConfig.nodeNames)
 	// initialize nodes and the cluster
@@ -100,6 +77,9 @@ func NewInfras(numberOfNodes int) (*ClusterInfras, error) {
 }
 
 func (infras *ClusterInfras) SendMessage(senderName string, receiverName string, message interface{}) interface{} {
+	if senderName == receiverName {
+		return fmt.Errorf("Sender and receiver must be different")
+	}
 	senderIdx := infras.nodes[0].ConsistentHash(senderName)
 	receiverIdx := infras.nodes[0].ConsistentHash(receiverName)
 	if senderIdx >= len(infras.nodes) || infras.nodes[senderIdx].name != senderName {
