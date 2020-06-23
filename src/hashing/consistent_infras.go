@@ -2,25 +2,20 @@ package hashing
 
 import (
 	"fmt"
-	"hash"
-	"hash/crc32"
-	"math/rand"
 	"reflect"
 	"sort"
 )
 
 /**
- * Random-string generator
+ * All RPC structs definition
  */
-const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-const nameLength = 10
+type ReadRequest struct {
+	key string
+}
 
-func randomString(length int) string {
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))]
-	}
-	return string(b)
+type ReadResponse struct {
+	value int
+	err   error
 }
 
 /**
@@ -28,27 +23,44 @@ func randomString(length int) string {
  */
 type NodeConfig struct {
 	nodeNames []string
-	hashFunc  hash.Hash32
 	network   *ClusterInfras
 }
 
 type Node struct {
 	name    string // a representative of real-life IP address:port
-	kvstore map[int]int
+	kvstore map[string]int
 	config  NodeConfig
 }
 
 func NewNode(name string, config NodeConfig) *Node {
-	return &Node{name: name, kvstore: make(map[int]int), config: config}
+	return &Node{name: name, kvstore: make(map[string]int), config: config}
 }
 
-func (node Node) Send(receiverName string, message interface{}) error {
-	return node.config.network.SendMessage(node.name, receiverName, message)
+func (node Node) ConsistentHash(key string) int {
+	nodeIndex := sort.Search(len(node.config.nodeNames), func(index int) bool {
+		return hashSum(node.config.nodeNames[index]) >= hashSum(key)
+	})
+	return nodeIndex % len(node.config.nodeNames)
 }
 
-func (node Node) Receive(senderName string, message interface{}) error {
+func (node Node) Send(receiverName string, message interface{}) interface{} {
+	switch rpc := message.(type) {
+	case ReadRequest:
+		response := node.config.network.SendMessage(node.name, receiverName, message)
+		if readResp, ok := response.(ReadResponse); ok {
+			return readResp
+		}
+		return ReadResponse{err: response.(error)}
+	default:
+		return fmt.Errorf("Can't decode the message - its type is '%s'", reflect.TypeOf(rpc).String())
+	}
+}
+
+func (node Node) Receive(senderName string, message interface{}) interface{} {
 	fmt.Printf("Receiving from %s - message %s\n", senderName, message)
 	switch rpc := message.(type) {
+	case ReadRequest:
+		return node.Read(rpc)
 	default:
 		return fmt.Errorf("Can't decode the message - its type is '%s'", reflect.TypeOf(rpc).String())
 	}
@@ -64,10 +76,13 @@ type ClusterInfras struct {
 	isNodeDeath []bool
 }
 
-func NewInfras(numberOfNodes int) ClusterInfras {
+func NewInfras(numberOfNodes int) (*ClusterInfras, error) {
 	var infras ClusterInfras
+	if numberOfNodes <= 0 {
+		return nil, fmt.Errorf("Number of Nodes have to be bigger than 0")
+	}
 	// initialize share node config
-	nodeConfig := NodeConfig{hashFunc: crc32.NewIEEE(), network: &infras}
+	nodeConfig := NodeConfig{network: &infras}
 	for index := 0; index < numberOfNodes; index++ {
 		nodeConfig.nodeNames = append(nodeConfig.nodeNames, randomString(nameLength))
 	}
@@ -81,16 +96,12 @@ func NewInfras(numberOfNodes int) ClusterInfras {
 	for index := 0; index < numberOfNodes; index++ {
 		infras.isNodeDeath[index] = false
 	}
-	return infras
+	return &infras, nil
 }
 
-func (infras *ClusterInfras) SendMessage(senderName string, receiverName string, message interface{}) error {
-	senderIdx := sort.Search(len(infras.nodes), func(index int) bool {
-		return infras.nodes[index].name >= senderName
-	})
-	receiverIdx := sort.Search(len(infras.nodes), func(index int) bool {
-		return infras.nodes[index].name >= receiverName
-	})
+func (infras *ClusterInfras) SendMessage(senderName string, receiverName string, message interface{}) interface{} {
+	senderIdx := infras.nodes[0].ConsistentHash(senderName)
+	receiverIdx := infras.nodes[0].ConsistentHash(receiverName)
 	if senderIdx >= len(infras.nodes) || infras.nodes[senderIdx].name != senderName {
 		return fmt.Errorf("Can't find node: %s", senderName)
 	}
