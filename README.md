@@ -1,4 +1,4 @@
-# Random stuff for training Golang and computer science
+# A collection of several well-known data structures as well as several computer science stuff implemented in Golang
 
 ```
 I am happy to receive any PR and issue if you find one
@@ -15,9 +15,9 @@ Many thanks!
 - [SSTable](src/lsm/README.md)
 - [Skip List](src/skiplist/README.md)
 - [B+Tree](src/btree/README.md)
-- [Consistent hashing](src/hashing/README.md)
 
 ## WIP:
+- [Consistent hashing](src/hashing/README.md)
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method
