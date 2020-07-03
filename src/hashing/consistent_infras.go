@@ -24,7 +24,7 @@ func NewNode(name string, config NodeConfig) *Node {
 	return &Node{name: name, kvstore: make(map[string]int), config: config}
 }
 
-func (node Node) ConsistentHash(key string) int {
+func (node Node) FindExpectedNode(key string) int {
 	nodeIndex := sort.Search(len(node.config.nodeNames), func(index int) bool {
 		return hashSum(node.config.nodeNames[index]) >= hashSum(key)
 	})
@@ -81,8 +81,8 @@ func (infras *ClusterInfras) SendMessage(senderName string, receiverName string,
 	if senderName == receiverName {
 		return fmt.Errorf("Sender and receiver must be different")
 	}
-	senderIdx := infras.nodes[0].ConsistentHash(senderName)
-	receiverIdx := infras.nodes[0].ConsistentHash(receiverName)
+	senderIdx := infras.nodes[0].FindExpectedNode(senderName)
+	receiverIdx := infras.nodes[0].FindExpectedNode(receiverName)
 	if senderIdx >= len(infras.nodes) || infras.nodes[senderIdx].name != senderName {
 		return fmt.Errorf("Can't find node: %s", senderName)
 	}

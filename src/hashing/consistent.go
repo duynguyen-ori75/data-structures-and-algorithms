@@ -34,7 +34,7 @@ func (node Node) Read(request ReadRequest) ReadResponse {
 	if val, ok := node.kvstore[request.key]; ok {
 		return ReadResponse{value: val, err: nil}
 	}
-	expectedNodeIndex := node.ConsistentHash(request.key)
+	expectedNodeIndex := node.FindExpectedNode(request.key)
 	if node.name == node.config.nodeNames[expectedNodeIndex] {
 		return ReadResponse{err: fmt.Errorf("Key %s does not exist", request.key)}
 	}
@@ -53,7 +53,7 @@ func (node Node) Read(request ReadRequest) ReadResponse {
  * @return     The write response from the cluster
  */
 func (node *Node) Write(request WriteRequest) WriteResponse {
-	expectedNodeIndex := node.ConsistentHash(request.key)
+	expectedNodeIndex := node.FindExpectedNode(request.key)
 	if node.name == node.config.nodeNames[expectedNodeIndex] {
 		node.kvstore[request.key] = request.value
 		return WriteResponse{err: nil}

@@ -25,7 +25,7 @@ func TestUtilities(t *testing.T) {
 	}
 }
 
-func TestConsistentHash(t *testing.T) {
+func TestFindExpectedNode(t *testing.T) {
 	infras, err := NewInfras(100)
 	if err != nil {
 		t.Errorf("Should not raise any exception. Meet: %s", err)
@@ -44,8 +44,8 @@ func TestConsistentHash(t *testing.T) {
 	firstNode := infras.nodes[0]
 	testKeys := []string{"abcxyz", "12jahjsad", "ahjjsad124", "dumpKey", "w98e87as7cc", infras.nodes[10].name, firstNode.name}
 	for _, testKey := range testKeys {
-		expectedNodeIdx := firstNode.ConsistentHash(testKey)
-		if expectedNodeIdx != firstNode.ConsistentHash(testKey) {
+		expectedNodeIdx := firstNode.FindExpectedNode(testKey)
+		if expectedNodeIdx != firstNode.FindExpectedNode(testKey) {
 			t.Error("Consistent hashing function should be deterministic")
 		}
 		// find correct node in the ring to store the key-value
