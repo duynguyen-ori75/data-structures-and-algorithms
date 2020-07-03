@@ -3,6 +3,7 @@ package hashing
 import (
 	//"log"
 	"math/rand"
+	"reflect"
 	"sort"
 	"strings"
 	"testing"
@@ -40,6 +41,13 @@ func TestFindExpectedNode(t *testing.T) {
 	if !sort.SliceIsSorted(infras.nodes, less) {
 		t.Error("All nodes should be sorted in order of their names")
 	}
+	for index, node := range infras.nodes {
+		for _, loopNode := range infras.nodes {
+			if loopNode.config.nodeNames[index] != node.name {
+				t.Error("Correct node position")
+			}
+		}
+	}
 	// check the determinism and correctness of Consistent Hashing function
 	firstNode := infras.nodes[0]
 	testKeys := []string{"abcxyz", "12jahjsad", "ahjjsad124", "dumpKey", "w98e87as7cc", infras.nodes[10].name, firstNode.name}
@@ -76,5 +84,41 @@ func TestFindExpectedNode(t *testing.T) {
 	response := firstNode.Read(ReadRequest{key: "not-exist"})
 	if response.err == nil {
 		t.Error("Read non-existing key should raise exception")
+	}
+}
+
+func TestAddNewNode(t *testing.T) {
+	infras, err := NewInfras(100)
+	if err != nil {
+		t.Errorf("Should not raise any exception. Meet: %s", err)
+	}
+	// starting inserting new node
+	firstNode := infras.nodes[0]
+	testNewNodeNames := []string{"abcxyz", "12jahjsad", "ahjjsad124", "dumpKey", "w98e87as7cc"}
+	for _, nodeName := range testNewNodeNames {
+		firstNode.AddNode(AddNodeRequest{name: nodeName})
+		resp := infras.AddNewNode(nodeName)
+		switch response := resp.(type) {
+		case error:
+			t.Errorf("Should not raise error here. Meet: %s", response)
+		case int:
+			for _, node := range infras.nodes {
+				if node.config.nodeNames[response] != nodeName {
+					t.Errorf("Wrong state at node %s. New node should be inserted at index %d. Current name at index %d is %s",
+						node.name, response, response, node.config.nodeNames[response])
+				}
+			}
+		default:
+			t.Errorf("Unexpected response here. Its type is %s", reflect.TypeOf(resp).String())
+		}
+		// insert existing node -> nothing happens
+		firstNode.AddNode(AddNodeRequest{name: nodeName})
+		// check size of node names
+		for index, node := range infras.nodes {
+			if len(node.config.nodeNames) != len(infras.nodes) {
+				t.Errorf("Size of nodes names in node %d should be %d instead of %d",
+					index, len(infras.nodes), len(node.config.nodeNames))
+			}
+		}
 	}
 }
