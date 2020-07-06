@@ -4,7 +4,6 @@ package lrucache
 
 import (
 	"container/list"
-	"fmt"
 )
 
 type Pair struct {

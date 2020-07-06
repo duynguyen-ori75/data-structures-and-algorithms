@@ -8,16 +8,16 @@ Many thanks!
 ```
 
 ## Finish:
-- [Bloom filter](src/bloom/README.md)
-- [CPU Cache line & false-sharing benchmarks](src/cpu/README.md)
-- [Lock-free stack](src/lockfree/README.md)
+- [Bloom filter](bloom/README.md)
+- [CPU Cache line & false-sharing benchmarks](cpu/README.md)
+- [Lock-free stack](lockfree/README.md)
 - [LRU Cache](https://leetcode.com/problems/lru-cache/)
-- [SSTable](src/lsm/README.md)
-- [Skip List](src/skiplist/README.md)
-- [B+Tree](src/btree/README.md)
+- [SSTable](lsm/README.md)
+- [Skip List](skiplist/README.md)
+- [B+Tree](btree/README.md)
 
 ## WIP:
-- [Consistent hashing](src/hashing/README.md)
+- [Consistent hashing](hashing/README.md)
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method
