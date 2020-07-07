@@ -2,7 +2,7 @@
 
 ```
 I am happy to receive any PR and issue if you find one
-If you have any proposal on what I should do next, you can also create a new issue for it
+If you have any proposal on what I should do next, please create a new issue and describe it
 
 Many thanks!
 ```
@@ -18,9 +18,9 @@ Many thanks!
 
 ## WIP:
 - [Consistent hashing](hashing/README.md)
+- [Lock-free queue](lockfree/README.md)
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method
-- Lock-free queue
 - Log-structured Merge tree
 - External Sort

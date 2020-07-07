@@ -18,12 +18,15 @@ To sum up, do not attempt to implement Lock-free data structures, the performanc
 ```
 goos: linux
 goarch: amd64
-BenchmarkNormalStack-8               	     205	   5789611 ns/op
-BenchmarkLockFreeStack_2_threads-8   	     178	   6743428 ns/op
-BenchmarkLockFreeStack_4_threads-8   	     141	   8547525 ns/op
-BenchmarkLockFreeStack_8_threads-8   	      98	  13555513 ns/op
+pkg: github.com/duynguyen-ori75/playground/lockfree
+BenchmarkSingleLockQueue_4_threads-8   	      37	  29474997 ns/op
+BenchmarkTwoLockQueue_4_threads-8      	      40	  30265734 ns/op
+BenchmarkNormalStack_4_threads-8       	     207	   5692627 ns/op
+BenchmarkLockFreeStack_2_threads-8     	     158	   7439368 ns/op
+BenchmarkLockFreeStack_4_threads-8     	     100	  10112392 ns/op
+BenchmarkLockFreeStack_8_threads-8     	      84	  15641695 ns/op
 PASS
-ok  	_/home/duynguyen/Workplace/learning/src/lockfree	7.056s
+ok  	github.com/duynguyen-ori75/playground/lockfree	9.417s
 ```
 
 ## References:

@@ -11,17 +11,17 @@ const numberOfPops = 10000
 
 func TestNormalStack(t *testing.T) {
 	s := Stack{}
-	_, err := s.pop()
+	_, err := s.Pop()
 	if err == nil {
 		t.Error("Pop from empty stack should raise exception")
 	}
-	s.push(1)
-	s.push(3)
-	s.push(5)
-	s.push(2)
+	s.Push(1)
+	s.Push(3)
+	s.Push(5)
+	s.Push(2)
 	b := [...]int{2, 5, 3, 1}
 	for idx := 0; idx < 4; idx++ {
-		val, err := s.pop()
+		val, err := s.Pop()
 		if err != nil {
 			t.Error("Shouldn't raise any exception, receive:", err)
 		}
@@ -39,7 +39,7 @@ func TestLockFreeStack(t *testing.T) {
 		go func(s *LockFreeStack) {
 			defer wg.Done()
 			for times := 0; times < 100; times++ {
-				s.lfPush(rand.Intn(100))
+				s.Push(rand.Intn(100))
 			}
 		}(s)
 	}
@@ -58,7 +58,7 @@ func TestLockFreeStack(t *testing.T) {
 			go func(s *LockFreeStack) {
 				defer wg.Done()
 				for noPop := 0; noPop < 10; noPop++ {
-					_, err := s.lfPop()
+					_, err := s.Pop()
 					if err != nil {
 						t.Error("Good pop shouldn't raise any exception")
 					}
@@ -71,36 +71,36 @@ func TestLockFreeStack(t *testing.T) {
 
 func BenchmarkNormalStack_4_threads(t *testing.B) {
 	var wg sync.WaitGroup
-	for times := 0; times < t.N; times ++ {
-		s := Stack{}		
+	for times := 0; times < t.N; times++ {
+		s := Stack{}
 		wg.Add(4)
-		for thread := 0; thread < 4; thread ++ {
+		for thread := 0; thread < 4; thread++ {
 			go func() {
-				for val := 0; val < numberOfPushes / 4; val ++ {
-					s.push(val);
+				for val := 0; val < numberOfPushes/4; val++ {
+					s.Push(val)
 				}
-				for val := 0; val < numberOfPops / 4; val ++ {
-					s.pop();
+				for val := 0; val < numberOfPops/4; val++ {
+					s.Pop()
 				}
 				wg.Done()
 			}()
 		}
 		wg.Wait()
-	}	
+	}
 }
 
 func BenchLockFreeStack(t *testing.B, numThreads int) {
 	var wg sync.WaitGroup
-	for times := 0; times < t.N; times ++ {
+	for times := 0; times < t.N; times++ {
 		s := newLockFreeStack()
 		wg.Add(numThreads)
-		for thread := 0; thread < numThreads; thread ++ {
+		for thread := 0; thread < numThreads; thread++ {
 			go func() {
-				for val := 0; val < numberOfPushes / numThreads; val ++ {
-					s.lfPush(val);
+				for val := 0; val < numberOfPushes/numThreads; val++ {
+					s.Push(val)
 				}
-				for val := 0; val < numberOfPops / numThreads; val ++ {
-					s.lfPop();
+				for val := 0; val < numberOfPops/numThreads; val++ {
+					s.Pop()
 				}
 				wg.Done()
 			}()
@@ -110,5 +110,5 @@ func BenchLockFreeStack(t *testing.B, numThreads int) {
 }
 
 func BenchmarkLockFreeStack_2_threads(t *testing.B) { BenchLockFreeStack(t, 2) }
-func BenchmarkLockFreeStack_4_threads(t *testing.B) {BenchLockFreeStack(t, 4) }
+func BenchmarkLockFreeStack_4_threads(t *testing.B) { BenchLockFreeStack(t, 4) }
 func BenchmarkLockFreeStack_8_threads(t *testing.B) { BenchLockFreeStack(t, 8) }

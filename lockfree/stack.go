@@ -15,17 +15,17 @@ type Node struct {
 // Normal stack functions
 type Stack struct {
 	mutex sync.Mutex
-	head *Node
+	head  *Node
 }
 
-func (s *Stack) push(val int) {
+func (s *Stack) Push(val int) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	newNode := &Node{value: val, next: s.head}
 	s.head = newNode
 }
 
-func (s *Stack) pop() (int, error) {
+func (s *Stack) Pop() (int, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	if s.head == nil {
@@ -36,6 +36,7 @@ func (s *Stack) pop() (int, error) {
 	return popNode.value, nil
 }
 
+// for testing only
 func (s *Stack) size() int {
 	count := 0
 	for tmp := s.head; tmp != nil; tmp = tmp.next {
@@ -66,7 +67,7 @@ func (s *LockFreeStack) size() int {
 	return count
 }
 
-func (s *LockFreeStack) lfPush(val int) {
+func (s *LockFreeStack) Push(val int) {
 	for {
 		currentHead := atomic.LoadPointer(&s.head)
 		newNode := &Node{value: val, next: (*Node)(currentHead)}
@@ -76,7 +77,7 @@ func (s *LockFreeStack) lfPush(val int) {
 	}
 }
 
-func (s *LockFreeStack) lfPop() (int, error) {
+func (s *LockFreeStack) Pop() (int, error) {
 	for {
 		currentHead := atomic.LoadPointer(&s.head)
 		if (*Node)(currentHead) == s.nilNode {
