@@ -34,3 +34,4 @@ ok  	github.com/duynguyen-ori75/playground/lockfree	9.817s
 - https://www.cs.cmu.edu/~410-s05/lectures/L31_LockFree.pdf
 - https://preshing.com/20120612/an-introduction-to-lock-free-programming/
 - http://15418.courses.cs.cmu.edu/spring2013/article/46
+- https://www.cs.rochester.edu/~scott/papers/1996_PODC_queues.pdf

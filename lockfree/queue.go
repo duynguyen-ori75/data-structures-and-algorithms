@@ -4,8 +4,13 @@ import (
 	//"fmt"
 	"errors"
 	"sync"
+	"sync/atomic"
+	"unsafe"
 )
 
+/**
+ * Implementation of a simple MPMC queue using a single mutex for both head and tail
+ */
 type SingleLockQueue struct {
 	mux  sync.Mutex
 	head *Node
@@ -35,6 +40,10 @@ func (q *SingleLockQueue) Pop() (int, error) {
 	return headVal, nil
 }
 
+
+/**
+ * Implementation of a MPMC queue using two mutexes, one for head pointer and the other for the tail
+ */
 type TwoLockQueue struct {
 	headMux sync.Mutex
 	tailMux sync.Mutex
@@ -72,4 +81,45 @@ func (q TwoLockQueue) size() int {
 		count++
 	}
 	return count
+}
+
+/**
+ * Implementation of a MPMC lock-free queue using 
+ */
+type LockFreeQueue struct {
+	head    unsafe.Pointer
+	tail    unsafe.Pointer
+}
+
+func NewLockFreeQueue() *LockFreeQueue {
+	nullNode := unsafe.Pointer(&Node{value: 0, next: nil})
+	return &LockFreeQueue{head: nullNode, tail: nullNode}
+}
+
+func (q *LockFreeQueue) Push(val int) {
+	newNode := &Node{value: val}
+	for {
+		currentTail := atomic.LoadPointer(&q.tail)
+		desiredModifiedOldTail := (*Node)(currentTail)
+		if desiredModifiedOldTail.next == nil {
+			desiredModifiedOldTail.next = newNode
+			if atomic.CompareAndSwapPointer(&q.tail, currentTail, unsafe.Pointer(desiredModifiedOldTail)) {
+				atomic.CompareAndSwapPointer(&q.tail, unsafe.Pointer(desiredModifiedOldTail), unsafe.Pointer(newNode))
+				break
+			}
+		}
+	}
+}
+
+func (q* LockFreeQueue) Pop() (int, error) {
+	for {
+		currentHead := atomic.LoadPointer(&q.head)
+		if currentHead == atomic.LoadPointer(&q.tail) {
+			return -1, errors.New("Stack is empty, can't pop")
+		}
+		expectedNewHead := ((*Node)(currentHead)).next
+		if atomic.CompareAndSwapPointer(&q.head, currentHead, unsafe.Pointer(expectedNewHead)) {
+			return ((*Node)(currentHead)).value, nil
+		}
+	}
 }
