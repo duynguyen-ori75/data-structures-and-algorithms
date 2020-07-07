@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+const benchNumThreads = 8
+
 func TestTwoLockQueue(t *testing.T) {
 	q := NewTwoLockQueue()
 	_, err := q.Pop()
@@ -32,13 +34,13 @@ func TestTwoLockQueue(t *testing.T) {
 func TestTwoLockQueue_Concurrency(t *testing.T) {
 	var wg sync.WaitGroup
 	q := NewTwoLockQueue()
-	wg.Add(4)
-	for thread := 0; thread < 4; thread++ {
+	wg.Add(benchNumThreads)
+	for thread := 0; thread < benchNumThreads; thread++ {
 		go func() {
-			for val := 0; val < numberOfPushes/4; val++ {
+			for val := 0; val < numberOfPushes/benchNumThreads; val++ {
 				q.Push(val)
 			}
-			for time := 0; time < numberOfPops/4; time++ {
+			for time := 0; time < numberOfPops/benchNumThreads; time++ {
 				_, err := q.Pop()
 				if err != nil {
 					t.Errorf("Should not raise exception here. Meet: %s", err)
@@ -54,16 +56,22 @@ func TestTwoLockQueue_Concurrency(t *testing.T) {
 	}
 }
 
-func BenchmarkSingleLockQueue_4_threads(t *testing.B) {
+func BenchmarkSingleLockQueue_8_threads(t *testing.B) {
+	// intialize
 	var wg sync.WaitGroup
+	actions := []int{}
+	for val := 0; val < numberOfPushes; val++ {
+		actions = append(actions, rand.Intn(100))
+	}
+	t.ResetTimer()
 	for times := 0; times < t.N; times++ {
 		q := NewSingleLockQueue()
-		wg.Add(4)
-		for thread := 0; thread < 4; thread++ {
+		wg.Add(benchNumThreads)
+		for thread := 0; thread < benchNumThreads; thread++ {
 			go func() {
 				// 70% push - 30% pop
-				for val := 0; val < numberOfPushes; val ++ {
-					if rand.Intn(100) < 70 {
+				for val := 0; val < numberOfPushes; val++ {
+					if actions[val] < 70 {
 						q.Push(val)
 					} else {
 						q.Pop()
@@ -76,16 +84,22 @@ func BenchmarkSingleLockQueue_4_threads(t *testing.B) {
 	}
 }
 
-func BenchmarkTwoLockQueue_4_threads(t *testing.B) {
+func BenchmarkTwoLockQueue_8_threads(t *testing.B) {
+	// intialize
 	var wg sync.WaitGroup
+	actions := []int{}
+	for val := 0; val < numberOfPushes; val++ {
+		actions = append(actions, rand.Intn(100))
+	}
+	t.ResetTimer()
 	for times := 0; times < t.N; times++ {
 		q := NewTwoLockQueue()
-		wg.Add(4)
-		for thread := 0; thread < 4; thread++ {
+		wg.Add(benchNumThreads)
+		for thread := 0; thread < benchNumThreads; thread++ {
 			go func() {
 				// 70% push - 30% pop
-				for val := 0; val < numberOfPushes; val ++ {
-					if rand.Intn(100) < 70 {
+				for val := 0; val < numberOfPushes; val++ {
+					if actions[val] < 70 {
 						q.Push(val)
 					} else {
 						q.Pop()
