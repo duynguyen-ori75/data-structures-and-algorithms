@@ -8,6 +8,13 @@ import (
 	"unsafe"
 )
 
+type Queue interface {
+	Push(int)
+	Pop() (int, error)
+	// size() is for testing only
+	size() int
+}
+
 /**
  * Implementation of a simple MPMC queue using a single mutex for both head and tail
  */
@@ -38,6 +45,15 @@ func (q *SingleLockQueue) Pop() (int, error) {
 	headVal := q.head.next.value
 	q.head = q.head.next
 	return headVal, nil
+}
+
+// for testing only
+func (q SingleLockQueue) size() int {
+	count := -1
+	for tmp := q.head; tmp != nil; tmp = tmp.next {
+		count++
+	}
+	return count
 }
 
 
@@ -74,10 +90,9 @@ func (q *TwoLockQueue) Pop() (int, error) {
 	return headVal, nil
 }
 
-// for testing only
 func (q TwoLockQueue) size() int {
 	count := -1
-	for tmp := (*Node)(q.head); tmp != nil; tmp = tmp.next {
+	for tmp := q.head; tmp != nil; tmp = tmp.next {
 		count++
 	}
 	return count
@@ -86,40 +101,59 @@ func (q TwoLockQueue) size() int {
 /**
  * Implementation of a MPMC lock-free queue using 
  */
+type LFNode struct {
+	value int
+	next  unsafe.Pointer
+}
 type LockFreeQueue struct {
 	head    unsafe.Pointer
 	tail    unsafe.Pointer
 }
 
 func NewLockFreeQueue() *LockFreeQueue {
-	nullNode := unsafe.Pointer(&Node{value: 0, next: nil})
+	nullNode := unsafe.Pointer(&LFNode{value: 0, next: nil})
 	return &LockFreeQueue{head: nullNode, tail: nullNode}
 }
 
 func (q *LockFreeQueue) Push(val int) {
-	newNode := &Node{value: val}
+	newNode := &LFNode{value: val}
 	for {
-		currentTail := atomic.LoadPointer(&q.tail)
-		desiredModifiedOldTail := (*Node)(currentTail)
-		if desiredModifiedOldTail.next == nil {
-			desiredModifiedOldTail.next = newNode
-			if atomic.CompareAndSwapPointer(&q.tail, currentTail, unsafe.Pointer(desiredModifiedOldTail)) {
-				atomic.CompareAndSwapPointer(&q.tail, unsafe.Pointer(desiredModifiedOldTail), unsafe.Pointer(newNode))
+		currentTail := q.tail
+		nextNode := ((*LFNode)(currentTail)).next
+		if q.tail == currentTail && nextNode == nil {
+			if atomic.CompareAndSwapPointer(&((*LFNode)(currentTail).next), nil, unsafe.Pointer(newNode)) {
 				break
 			}
+		} else {
+			atomic.CompareAndSwapPointer(&q.tail, currentTail, nextNode)
 		}
 	}
 }
 
 func (q* LockFreeQueue) Pop() (int, error) {
 	for {
-		currentHead := atomic.LoadPointer(&q.head)
-		if currentHead == atomic.LoadPointer(&q.tail) {
+		currentHead, currentTail := q.head, q.tail
+		if currentHead == currentTail {
+			// tail is falling behind -> advance tail node
+			if ((*LFNode)(currentTail)).next != nil {
+				atomic.CompareAndSwapPointer(&q.tail, currentTail, ((*LFNode)(currentTail)).next)
+				continue
+			}
 			return -1, errors.New("Stack is empty, can't pop")
 		}
-		expectedNewHead := ((*Node)(currentHead)).next
-		if atomic.CompareAndSwapPointer(&q.head, currentHead, unsafe.Pointer(expectedNewHead)) {
-			return ((*Node)(currentHead)).value, nil
+		expectedNewHead := ((*LFNode)(currentHead)).next
+		if expectedNewHead != nil {
+			if atomic.CompareAndSwapPointer(&q.head, currentHead, unsafe.Pointer(expectedNewHead)) {
+				return ((*LFNode)(expectedNewHead)).value, nil
+			}
 		}
 	}
+}
+
+func (q LockFreeQueue) size() int {
+	count := -1
+	for tmp := q.head; tmp != nil; tmp = ((*LFNode)(tmp)).next {
+		count++
+	}
+	return count
 }
