@@ -5,22 +5,19 @@ import (
 	"fmt"
 )
 
-type Node struct {
-	up    *Node
-	down  *Node
-	right *Node
+type NewNode struct {
 	key   int
 	value int
+	level int
+	next  []*NewNode
 }
 
 type SkipList struct {
-	maxLevel int
-	// top-left head
-	head *Node
+	root *NewNode
 }
 
 func NewSkipList() *SkipList {
-	return &SkipList{maxLevel: 0, head: &Node{}}
+	return &SkipList{head: &NewNode{}}
 }
 
 func (list *SkipList) Search(key int) (int, error) {
@@ -29,45 +26,4 @@ func (list *SkipList) Search(key int) (int, error) {
 		return 0, fmt.Errorf("Key %d not found", key)
 	}
 	return node.value, nil
-}
-
-func (list *SkipList) Insert(key int, value int) error {
-	if key <= 0 {
-		return errors.New("All keys should be positive")
-	}
-	latestHeads, node := list.getRightMostNodes(key)
-	if node.key == key {
-		return fmt.Errorf("Key %d already exists", key)
-	}
-	// current node should be at level 1 (node.down == nil -> level 1)
-	nextNodeHeight := getNewHeight()
-	for ; list.maxLevel < nextNodeHeight; list.maxLevel++ {
-		newHead := &Node{up: nil, down: list.head, right: nil}
-		list.head.up = newHead
-		list.head, latestHeads = newHead, append(latestHeads, newHead)
-	}
-	var lowerNode *Node
-	for _, latestHead := range latestHeads[:nextNodeHeight+1] {
-		newNode := &Node{key: key, value: value, right: latestHead.right, down: lowerNode}
-		if lowerNode != nil {
-			lowerNode.up = newNode
-		}
-		latestHead.right, lowerNode = newNode, newNode
-	}
-	return nil
-}
-
-func (list *SkipList) Remove(key int) error {
-	latestHeads, _ := list.getRightMostNodes(key - 1)
-	for currentLevel, latestHead := range latestHeads {
-		node := latestHead.right
-		if node == nil || node.key != key {
-			if currentLevel == 0 {
-				return fmt.Errorf("Key %d not found", key)
-			}
-			break
-		}
-		latestHead.right = node.right
-	}
-	return nil
 }

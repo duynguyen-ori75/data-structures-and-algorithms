@@ -14,7 +14,7 @@ func arrayToString(a []int) string {
 }
 
 func TestSkipListCorrectness(t *testing.T) {
-	list := NewSkipList()
+	list := NewSkipListPointers()
 	expected := make(map[int]int)
 	expectedKeys := []int{}
 	for index := 0; index < 500; index++ {
@@ -23,7 +23,6 @@ func TestSkipListCorrectness(t *testing.T) {
 			expected[newKey], expectedKeys = newVal, append(expectedKeys, newKey)
 			sort.Ints(expectedKeys)
 		}
-		//fmt.Printf("Try to insert (%d, %d)\n", newKey, newVal)
 		err := list.Insert(newKey, newVal)
 		if err != nil {
 			value, err := list.Search(newKey)
@@ -55,7 +54,6 @@ func TestSkipListCorrectness(t *testing.T) {
 		if chosenKeyIndex > 0 {
 			nodeBefore = list.searchNode(expectedKeys[chosenKeyIndex-1])
 		}
-		//fmt.Printf("Try to remove key %d\n", removedKey)
 		list.Remove(removedKey)
 		expectedKeys = append(expectedKeys[:chosenKeyIndex], expectedKeys[chosenKeyIndex+1:]...)
 		level := 0

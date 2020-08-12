@@ -23,14 +23,14 @@ func (node *Node) getColumnHeight() int {
 	return result
 }
 
-func (list *SkipList) getLevelZeroHead() *Node {
+func (list *SkipListPointers) getLevelZeroHead() *Node {
 	current := list.head
 	for ; current.down != nil; current = current.down {
 	}
 	return current
 }
 
-func (list *SkipList) getFirstLevelKeys() []int {
+func (list *SkipListPointers) getFirstLevelKeys() []int {
 	current, result := list.head, []int{}
 	for ; current.down != nil; current = current.down {
 	}
@@ -43,7 +43,7 @@ func (list *SkipList) getFirstLevelKeys() []int {
 	return result
 }
 
-func (list *SkipList) logAllList() {
+func (list *SkipListPointers) logAllList() {
 	current := list.head
 	for ; current.down != nil; current = current.down {
 	}
@@ -54,7 +54,7 @@ func (list *SkipList) logAllList() {
 	fmt.Println("======")
 }
 
-func (list *SkipList) searchNode(key int) *Node {
+func (list *SkipListPointers) searchNode(key int) *Node {
 	if key <= 0 {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (list *SkipList) searchNode(key int) *Node {
 	return node
 }
 
-func (list *SkipList) getRightMostNodes(key int) ([]*Node, *Node) {
+func (list *SkipListPointers) getRightMostNodes(key int) ([]*Node, *Node) {
 	latestHeads, node := make([]*Node, list.maxLevel+1), list.head
 	for currentLevel := list.maxLevel; currentLevel >= 0; currentLevel-- {
 		for node.right != nil && node.right.key <= key {
@@ -83,4 +83,22 @@ func (list *SkipList) getRightMostNodes(key int) ([]*Node, *Node) {
 		}
 	}
 	return latestHeads, node
+}
+
+func (list *SkipList) searchNode(key int) *Node {
+	if key <= 0 {
+		return -1, errors.New("Key should not be lower than zero")
+	}
+	node, currentLv := list.root, list.root.level
+	for node != nil {
+		for ; currentLv >= 0; currentLv-- {
+			if node.next[currentLv] != nil && node.next[currentLv].key <= key {
+				node = node.next[currentLv]
+			}
+		}
+		if currentLv < 0 {
+			break
+		}
+	}
+	return node
 }
