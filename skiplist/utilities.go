@@ -85,9 +85,9 @@ func (list *SkipListPointers) getRightMostNodes(key int) ([]*Node, *Node) {
 	return latestHeads, node
 }
 
-func (list *SkipList) searchNode(key int) *Node {
+func (list *SkipList) searchNode(key int) *NewNode {
 	if key <= 0 {
-		return -1, errors.New("Key should not be lower than zero")
+		return nil
 	}
 	node, currentLv := list.root, list.root.level
 	for node != nil {

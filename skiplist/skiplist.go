@@ -1,7 +1,7 @@
 package skiplist
 
 import (
-	"errors"
+	//"errors"
 	"fmt"
 )
 
@@ -17,7 +17,7 @@ type SkipList struct {
 }
 
 func NewSkipList() *SkipList {
-	return &SkipList{head: &NewNode{}}
+	return &SkipList{root: &NewNode{}}
 }
 
 func (list *SkipList) Search(key int) (int, error) {
