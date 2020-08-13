@@ -15,8 +15,7 @@ type Node struct {
 
 type SkipListPointers struct {
 	maxLevel int
-	// top-left head
-	head *Node
+	head     *Node
 }
 
 func NewSkipListPointers() *SkipListPointers {

@@ -6,6 +6,14 @@ A skiplist is an ordered data structure providing expected O(Log(n)) lookup, ins
 
 ![Visualization](https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Skip_list.svg/800px-Skip_list.svg.png "Skip list")
 
+## Implementation:
+- SkipListPointers: Every node in Skip list is pointer, even nodes that have the same key (nodes in the same column)
+- SkipList: Only one node per key, and each node maintains its own next pointers
+
+## TODO:
+- Finish SkipList implementation
+- Benchmark two versions
+
 ## References:
 - https://en.wikipedia.org/wiki/Skip_list
 - https://www.cl.cam.ac.uk/teaching/2005/Algorithms/skiplists.pdf

@@ -85,6 +85,14 @@ func (list *SkipListPointers) getRightMostNodes(key int) ([]*Node, *Node) {
 	return latestHeads, node
 }
 
+func (list *SkipList) getFirstLevelKeys() []int {
+	result := []int{}
+	for current := list.root.next[0]; current != nil; current = current.next[0] {
+		result = append(result, current.key)
+	}
+	return result
+}
+
 func (list *SkipList) searchNode(key int) *NewNode {
 	if key <= 0 {
 		return nil
@@ -101,4 +109,15 @@ func (list *SkipList) searchNode(key int) *NewNode {
 		}
 	}
 	return node
+}
+
+func (list *SkipList) getRightMostNodes(key int) ([]*NewNode, *NewNode) {
+	latestHeads, node := make([]*NewNode, list.root.level+1), list.root
+	for currentLevel := list.root.level; currentLevel >= 0; currentLevel-- {
+		for node.next[currentLevel] != nil && node.next[currentLevel].key <= key {
+			node = node.next[currentLevel]
+		}
+		latestHeads[currentLevel] = node
+	}
+	return latestHeads, node
 }

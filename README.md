@@ -13,11 +13,11 @@ Many thanks!
 - [Concurrency stack & queue (including lock-free implementation of both data structures)](concurrency/README.md)
 - [LRU Cache](https://leetcode.com/problems/lru-cache/)
 - [SSTable](lsm/README.md)
-- [Skip List](skiplist/README.md)
 - [B+Tree](btree/README.md)
 
 ## WIP:
 - [Consistent hashing](hashing/README.md)
+- [Skip List - new implmentation](skiplist/README.md)
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method

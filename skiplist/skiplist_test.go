@@ -13,7 +13,7 @@ func arrayToString(a []int) string {
 	return strings.Replace(fmt.Sprint(a), " ", ",", -1)
 }
 
-func TestSkipListCorrectness(t *testing.T) {
+func TestSkipListPointersCorrectness(t *testing.T) {
 	list := NewSkipListPointers()
 	expected := make(map[int]int)
 	expectedKeys := []int{}
@@ -74,5 +74,42 @@ func TestSkipListCorrectness(t *testing.T) {
 		if err == nil {
 			t.Errorf("After the removal, key %d should not be found", removedKey)
 		}
+	}
+}
+
+func TestSkipListInsert(t *testing.T) {
+	list := NewSkipList()
+	err := list.Insert(0, 2)
+	if err == nil {
+		t.Error("Should raise exception here")
+	}
+	err = list.Insert(2, 5)
+	if err != nil {
+		t.Errorf("Should not raise exception. Meet: %s", err)
+	}
+	err = list.Insert(2, 10)
+	if err == nil {
+		t.Error("Should raise exception here")
+	}
+	list.Insert(6, 2)
+	list.Insert(3, 1)
+	list.Insert(15, 4)
+	val, err := list.Search(4)
+	if err == nil {
+		t.Error("Should raise exception here")
+	}
+	val, err = list.Search(15)
+	if err != nil {
+		t.Errorf("Should not raise exception here. Meet: %s", err)
+	}
+	if val != 4 {
+		t.Errorf("Returned value should be 4 instead of %d", val)
+	}
+	val, err = list.Search(3)
+	if err != nil {
+		t.Errorf("Should not raise exception here. Meet: %s", err)
+	}
+	if val != 1 {
+		t.Errorf("Returned value should be 1 instead of %d", val)
 	}
 }
