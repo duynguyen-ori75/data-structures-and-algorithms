@@ -12,7 +12,6 @@ Many thanks!
 - [CPU Cache line & false-sharing benchmarks](cpu/README.md)
 - [Concurrency stack & queue (including lock-free implementation of both data structures)](concurrency/README.md)
 - [LRU Cache](https://leetcode.com/problems/lru-cache/)
-- [SSTable](lsm/README.md)
 - [B+Tree](btree/README.md)
 
 ## WIP:
