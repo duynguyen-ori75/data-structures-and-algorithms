@@ -1,10 +1,8 @@
-# Lock-free stack benchmark
+# Lock-free stack and queue benchmark
 
 ## Information
 
 There are a lof of online resources about this topic, and one of them is [Introduction to Lock-free Programming](https://preshing.com/20120612/an-introduction-to-lock-free-programming/).
-
-To sum up, do not attempt to implement Lock-free data structures, the performance is probably not as good as traditional mutex, unless you have a deep knowledge about this area.
 
 ## Benchmark info:
 
