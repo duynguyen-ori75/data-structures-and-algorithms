@@ -29,7 +29,6 @@ func (list *SkipList) Search(key int) (int, error) {
 }
 
 func (list *SkipList) Insert(key int, value int) error {
-	//fmt.Println("--------------Try to insert (", key, value, ")---------------")
 	if key <= 0 {
 		return errors.New("All keys should be positive")
 	}
@@ -46,14 +45,32 @@ func (list *SkipList) Insert(key int, value int) error {
 		}
 		list.root.level = newNodeHeight
 	}
-	//fmt.Println(latestHeads)
 	for level, latestHead := range latestHeads {
-		//fmt.Println(level, latestHead)
 		if level > newNodeHeight {
-			//fmt.Println("Exit now")
 			break
 		}
 		newNode.next[level], latestHead.next[level] = latestHead.next[level], newNode
+	}
+	return nil
+}
+
+func (list *SkipList) Remove(key int) error {
+	if key <= 0 {
+		return errors.New("All keys should be positive")
+	}
+	latestHeads, node := list.getRightMostNodes(key - 1)
+	if node.next[0] == nil || node.next[0].key != key {
+		return fmt.Errorf("Key %d does not exists", key)
+	}
+	for currentLevel, latestHead := range latestHeads {
+		node = latestHead.next[currentLevel]
+		if node == nil || node.key != key {
+			if currentLevel == 0 {
+				return fmt.Errorf("Key %d not found", key)
+			}
+			break
+		}
+		latestHead.next[currentLevel] = node.next[currentLevel]
 	}
 	return nil
 }

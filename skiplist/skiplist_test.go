@@ -18,7 +18,7 @@ func TestSkipListPointersCorrectness(t *testing.T) {
 	expected := make(map[int]int)
 	expectedKeys := []int{}
 	for index := 0; index < 500; index++ {
-		newKey, newVal := rand.Int()%1000+1, rand.Int()%1000
+		newKey, newVal := rand.Intn(1000)+1, rand.Intn(1000)
 		if _, ok := expected[newKey]; !ok {
 			expected[newKey], expectedKeys = newVal, append(expectedKeys, newKey)
 			sort.Ints(expectedKeys)
@@ -49,7 +49,7 @@ func TestSkipListPointersCorrectness(t *testing.T) {
 		t.Errorf("Height of head column (which is %d) should be equal to maxLevel(%d)", list.head.getColumnHeight(), list.maxLevel)
 	}
 	for index := 0; index < 200; index++ {
-		chosenKeyIndex := rand.Int() % len(expectedKeys)
+		chosenKeyIndex := rand.Intn(len(expectedKeys))
 		nodeBefore, currentNode, removedKey := list.getLevelZeroHead(), list.searchNode(expectedKeys[chosenKeyIndex]), expectedKeys[chosenKeyIndex]
 		if chosenKeyIndex > 0 {
 			nodeBefore = list.searchNode(expectedKeys[chosenKeyIndex-1])
@@ -111,5 +111,49 @@ func TestSkipListInsert(t *testing.T) {
 	}
 	if val != 1 {
 		t.Errorf("Returned value should be 1 instead of %d", val)
+	}
+}
+
+func TestSkipListRemove(t *testing.T) {
+	list := NewSkipList()
+	expectedMap := make(map[int]int)
+	for idx := 1; idx < 100; idx++ {
+		key, value := idx, rand.Intn(100)
+		list.Insert(key, value)
+		expectedMap[key] = value
+	}
+  if !sort.IntsAreSorted(list.getFirstLevelKeys()) {
+    t.Errorf("First-level keys should be sorted. Found: %s", arrayToString(list.getFirstLevelKeys()))
+  }
+	for idx := 1; idx < 50; idx++ {
+		selectedKey := rand.Intn(100)
+		expectedVal, expectedOk := expectedMap[selectedKey]
+		val, err := list.Search(selectedKey)
+		if err != nil {
+			if expectedOk {
+				t.Errorf("Key %d should exists with value: %d", selectedKey, expectedVal)
+			}
+			err = list.Remove(selectedKey)
+			if err == nil {
+				t.Error("Delete not existing key should throw exception")
+			}
+		} else {
+			if !expectedOk {
+				t.Errorf("Key %d should already be deleted. Found value: %d", selectedKey, val)
+			} else {
+				if expectedVal != val {
+					t.Errorf("expectedVal should equal to val. Found (%d, %d), respectively", expectedVal, val)
+				}
+				delete(expectedMap, selectedKey)
+				err = list.Remove(selectedKey)
+				if err != nil {
+					t.Errorf("Delete existing key should not raise exception. Meet: %s", err)
+				}
+				val, err = list.Search(selectedKey)
+				if err == nil {
+					t.Error("Delete not existing key should throw exception")
+				}
+			}
+		}
 	}
 }

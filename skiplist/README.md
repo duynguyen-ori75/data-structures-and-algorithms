@@ -11,7 +11,6 @@ A skiplist is an ordered data structure providing expected O(Log(n)) lookup, ins
 - SkipList: Only one node per key, and each node maintains its own next pointers
 
 ## TODO:
-- Finish SkipList implementation
 - Benchmark two versions
 
 ## References:

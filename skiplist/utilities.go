@@ -100,7 +100,7 @@ func (list *SkipList) searchNode(key int) *NewNode {
 	node, currentLv := list.root, list.root.level
 	for node != nil {
 		for ; currentLv >= 0; currentLv-- {
-			if node.next[currentLv] != nil && node.next[currentLv].key <= key {
+			for node.next[currentLv] != nil && node.next[currentLv].key <= key {
 				node = node.next[currentLv]
 			}
 		}
