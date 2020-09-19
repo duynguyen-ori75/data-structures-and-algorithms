@@ -1,5 +1,5 @@
 extern "C" {
-#include "rwlock.h"
+#include "simple_rwlock.h"
 #include "pthread.h"
 }
 #include <gtest/gtest.h>
@@ -31,10 +31,10 @@ TEST(SimpleReadWriteLockerTest, Basic) {
 
   // create 50 read threads and 50 write threads
   for (int idx = 0; idx < 100; idx ++) {
-    if (idx % 2 == 0) {
-      ASSERT_EQ(pthread_create(&(tid[idx]), NULL, &atomicAdd, cnt), 0);
-    } else {
+    if (idx % 4 == 0) {
       ASSERT_EQ(pthread_create(&(tid[idx]), NULL, &atomicRead, cnt), 0);
+    } else {
+      ASSERT_EQ(pthread_create(&(tid[idx]), NULL, &atomicAdd, cnt), 0);
     }
   }
 
@@ -42,7 +42,7 @@ TEST(SimpleReadWriteLockerTest, Basic) {
   for (int idx = 0; idx < 100; idx ++) pthread_join(tid[idx], NULL);
 
   // expect atomic counter to be correct
-  EXPECT_EQ(cnt->counter, 60);
+  EXPECT_EQ(cnt->counter, 85);
 }
 
 int main(int argc, char **argv) {
