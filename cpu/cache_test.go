@@ -31,7 +31,6 @@ func BenchmarkMissCacheline(t *testing.B) {
 			}
 		}
 	}
-
 }
 
 func BenchmarkHitCacheline(t *testing.B) {

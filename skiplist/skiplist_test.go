@@ -9,6 +9,9 @@ import (
 	"testing"
 )
 
+const BENCHMARK_LIMIT = 1000
+const KEY_MAXVAL = 100000000
+
 func arrayToString(a []int) string {
 	return strings.Replace(fmt.Sprint(a), " ", ",", -1)
 }
@@ -122,9 +125,9 @@ func TestSkipListRemove(t *testing.T) {
 		list.Insert(key, value)
 		expectedMap[key] = value
 	}
-  if !sort.IntsAreSorted(list.getFirstLevelKeys()) {
-    t.Errorf("First-level keys should be sorted. Found: %s", arrayToString(list.getFirstLevelKeys()))
-  }
+	if !sort.IntsAreSorted(list.getFirstLevelKeys()) {
+		t.Errorf("First-level keys should be sorted. Found: %s", arrayToString(list.getFirstLevelKeys()))
+	}
 	for idx := 1; idx < 50; idx++ {
 		selectedKey := rand.Intn(100)
 		expectedVal, expectedOk := expectedMap[selectedKey]
@@ -154,6 +157,54 @@ func TestSkipListRemove(t *testing.T) {
 					t.Error("Delete not existing key should throw exception")
 				}
 			}
+		}
+	}
+}
+
+/**
+ * Benchmark two versions
+ */
+
+func prepareTestData() ([]int, int) {
+	keyList, insertedKey := []int{}, make(map[int]bool)
+	for idx := 0; idx < BENCHMARK_LIMIT; idx++ {
+		newKey := rand.Intn(KEY_MAXVAL)
+		for _, found := insertedKey[newKey]; found; newKey = rand.Intn(KEY_MAXVAL) {
+		}
+		insertedKey[newKey] = true
+		keyList = append(keyList, newKey)
+	}
+	return keyList, BENCHMARK_LIMIT
+}
+
+func BenchmarkSkipListPointer(t *testing.B) {
+	insertedKeys, length := prepareTestData()
+	t.ResetTimer()
+	for test := 0; test < t.N; test++ {
+		list := NewSkipListPointers()
+		for _, key := range insertedKeys {
+			list.Insert(key, rand.Intn(length))
+		}
+		deletedKey := 10
+		for idx := 0; idx < length/10; idx++ {
+			list.Remove(deletedKey)
+			deletedKey += rand.Intn(length/100) + 1
+		}
+	}
+}
+
+func BenchmarkSkipListArray(t *testing.B) {
+	insertedKeys, length := prepareTestData()
+	t.ResetTimer()
+	for test := 0; test < t.N; test++ {
+		list := NewSkipList()
+		for _, key := range insertedKeys {
+			list.Insert(key, rand.Intn(length))
+		}
+		deletedKey := 10
+		for idx := 0; idx < length/10; idx++ {
+			list.Remove(deletedKey)
+			deletedKey += rand.Intn(length/100) + 1
 		}
 	}
 }

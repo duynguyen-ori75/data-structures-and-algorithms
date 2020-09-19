@@ -10,8 +10,17 @@ A skiplist is an ordered data structure providing expected O(Log(n)) lookup, ins
 - SkipListPointers: Every node in Skip list is pointer, even nodes that have the same key (nodes in the same column)
 - SkipList: Only one node per key, and each node maintains its own next pointers
 
-## TODO:
-- Benchmark two versions
+## Benchmark result:
+
+```
+goos: linux
+goarch: amd64
+pkg: github.com/duynguyen-ori75/playground/skiplist
+BenchmarkSkipListPointer-8        3553      367183 ns/op
+BenchmarkSkipListArray-8          3511      331744 ns/op
+PASS
+ok    github.com/duynguyen-ori75/playground/skiplist  3.549s
+```
 
 ## References:
 - https://en.wikipedia.org/wiki/Skip_list
