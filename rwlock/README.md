@@ -15,8 +15,7 @@ Inspired by this excellent blog: https://eli.thegreenplace.net/2019/implementing
 ## Compile command
 
 ```shell
-g++ rwlock_test.cc -lpthread -lgtest -o output
-./output
+make
 ```
 
 ## Requirements
