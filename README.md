@@ -1,4 +1,4 @@
-# A collection of several well-known data structures as well as several computer science stuff
+# A collection of several well-known data structures
 
 ```
 I am happy to receive any PR and issue if you find one
