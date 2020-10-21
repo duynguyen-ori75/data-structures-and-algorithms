@@ -1,9 +1,6 @@
 package rsa
 
-import (
-	"fmt"
-	"math/rand"
-)
+import "math/rand"
 
 type PublicKey struct {
 	n int
@@ -11,6 +8,7 @@ type PublicKey struct {
 }
 
 type PrivateKey struct {
+	n int
 	d int
 }
 
@@ -40,7 +38,7 @@ func NewRSAKeyPair(p int, q int) (PublicKey, PrivateKey) {
 			d = x / e
 		}
 	}
-	return PublicKey{n, e}, PrivateKey{d}
+	return PublicKey{n, e}, PrivateKey{n, d}
 }
 
 func PowerModulo(val int, times int, modulo int) int {

@@ -20,7 +20,13 @@ func TestRSAPair(t *testing.T) {
 	pubKey, priKey := NewRSAKeyPair(83, 97)
 	msg := 123
 	decodedMsg := PowerModulo(msg, pubKey.e, pubKey.n)
-	encodedMsg := PowerModulo(decodedMsg, priKey.d, pubKey.n)
+	encodedMsg := PowerModulo(decodedMsg, priKey.d, priKey.n)
+	if msg != encodedMsg {
+		t.Errorf("RSA Key pair is not working. Original msg: %d - encoded msg: %d", msg, encodedMsg)
+	}
+
+	decodedMsg = PowerModulo(msg, priKey.d, priKey.n)
+	encodedMsg = PowerModulo(decodedMsg, pubKey.e, pubKey.n)
 	if msg != encodedMsg {
 		t.Errorf("RSA Key pair is not working. Original msg: %d - encoded msg: %d", msg, encodedMsg)
 	}
