@@ -52,3 +52,7 @@ func PowerModulo(val int, times int, modulo int) int {
 	}
 	return result
 }
+
+// these two aliases are used for better understanding
+var decrypt = PowerModulo
+var encrypt = PowerModulo

@@ -18,16 +18,28 @@ func TestPowerModulo(t *testing.T) {
 
 func TestRSAPair(t *testing.T) {
 	pubKey, priKey := NewRSAKeyPair(83, 97)
-	msg := 123
-	decodedMsg := PowerModulo(msg, pubKey.e, pubKey.n)
-	encodedMsg := PowerModulo(decodedMsg, priKey.d, priKey.n)
-	if msg != encodedMsg {
-		t.Errorf("RSA Key pair is not working. Original msg: %d - encoded msg: %d", msg, encodedMsg)
+	message := 1234
+	encodedMsg := decrypt(message, pubKey.e, pubKey.n)
+	decodedMsg := encrypt(encodedMsg, priKey.d, priKey.n)
+	if message != decodedMsg {
+		t.Errorf("RSA Key pair is not working. Original message: %d - decrypted message: %d", message, decodedMsg)
 	}
 
-	decodedMsg = PowerModulo(msg, priKey.d, priKey.n)
-	encodedMsg = PowerModulo(decodedMsg, pubKey.e, pubKey.n)
-	if msg != encodedMsg {
-		t.Errorf("RSA Key pair is not working. Original msg: %d - encoded msg: %d", msg, encodedMsg)
+	encodedMsg = decrypt(message, priKey.d, priKey.n)
+	decodedMsg = encrypt(encodedMsg, pubKey.e, pubKey.n)
+	if message != decodedMsg {
+		t.Errorf("RSA Key pair is not working. Original message: %d - decrypted message: %d", message, decodedMsg)
+	}
+}
+
+func TestRSAEncryptTwoTimes(t *testing.T) {
+	pubKeyA, priKeyA := NewRSAKeyPair(83, 97)
+	pubKeyB, priKeyB := NewRSAKeyPair(79, 127)
+	originalMessageFromA := 1234
+	encryptedMessageFromA := decrypt(decrypt(originalMessageFromA, pubKeyB.e, pubKeyB.n), priKeyA.d, priKeyA.n)
+	decryptedMessage := encrypt(encrypt(encryptedMessageFromA, pubKeyA.e, pubKeyA.n), priKeyB.d, priKeyB.n)
+
+	if originalMessageFromA != decryptedMessage {
+		t.Errorf("RSA Key pairs are not working. Original message: %d - decrypted message: %d", originalMessageFromA, decryptedMessage)
 	}
 }
