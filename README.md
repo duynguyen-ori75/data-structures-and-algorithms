@@ -1,12 +1,5 @@
 # A collection of several well-known data structures
 
-```
-I am happy to receive any PR and issue if you find one
-If you have any proposal on what I should do next, please create a new issue and describe it
-
-Many thanks!
-```
-
 ## Finish:
 - [Bloom filter](bloom/README.md)
 - [B+Tree](btree/README.md)
