@@ -11,18 +11,25 @@
 #define DS_SIZE 10000
 #define NO_OPERATIONS 1000
 
-TEST(SortedArray, Insert) {
+TEST(SortedArray, Basic) {
+  std::unordered_set<int> keys;
   auto sArray = SortedArray(DS_SIZE);
 
   for (int idx = 0; idx < NO_OPERATIONS; idx ++) {
     int key = std::rand() % MODULO;
     int value = std::rand() % MODULO;
+    keys.insert(key);
 
     EXPECT_TRUE(sArray.Insert(key, value));
     auto result = sArray.Search(key);
     EXPECT_TRUE(result.first);
     EXPECT_EQ(result.second, value);
   }
+
+  for(auto key: keys) {
+    EXPECT_TRUE(sArray.Remove(key));
+  }
+  EXPECT_FALSE(sArray.Remove(123456));
 }
 
 TEST(SlottedPage, Basic) {
