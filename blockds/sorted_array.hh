@@ -1,24 +1,23 @@
 #include <algorithm>
 #include <vector>
 
-#include "page_format.h"
-
 typedef std::pair<int, int> KeyValue;
 
-class SortedArray : public BlockDataStructure {
+class SortedArray {
  private:
   std::vector<KeyValue> data_;
+  int size_;
 
   std::vector<KeyValue>::iterator lookUp(int key) {
-    auto it = std::lower_bound(this->data_.begin(), this->data_.end(),
-                               std::make_pair(key, -1),
-                               [](const KeyValue& lhs, const KeyValue& rhs) {
-                                 return lhs.first < rhs.first;
-                               });
-    return it;
+    return std::lower_bound(this->data_.begin(), this->data_.end(),
+                             std::make_pair(key, -1),
+                             [](const KeyValue& lhs, const KeyValue& rhs) {
+                               return lhs.first < rhs.first;
+                             });
   }
 
  public:
+  SortedArray(int size) : size_(size) {}
   std::pair<bool, int> Search(int key) {
     auto it = this->lookUp(key);
     if (it == this->data_.end() || it->first != key)
@@ -27,8 +26,12 @@ class SortedArray : public BlockDataStructure {
   }
   bool Insert(int key, int value) {
     auto it = this->lookUp(key);
-    if (it != this->data_.end() && it->first == key) return false;
-    this->data_.insert(it, value);
+    if (it != this->data_.end() && it->first == key) {
+      it->second = value;
+      return true;
+    }
+    if (this->data_.size() >= this->size_) return false;
+    this->data_.insert(it, std::make_pair(key, value));
     return true;
   }
   bool Remove(int key) {
@@ -37,4 +40,4 @@ class SortedArray : public BlockDataStructure {
     this->data_.erase(it);
     return true;
   }
-}
+};

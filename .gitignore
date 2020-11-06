@@ -5,3 +5,4 @@ bin/
 github.com/
 golang.org/
 rwlock/output
+blockds/output
