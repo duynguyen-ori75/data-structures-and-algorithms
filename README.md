@@ -7,6 +7,7 @@
 - [Concurrency stack & queue (including lock-free implementation of both data structures)](concurrency/README.md)
 - [LRU Cache](https://leetcode.com/problems/lru-cache/)
 - [ReadWriteLock implemented in C](rwlock/README.md)
+- [Sorted Array & Slotted pages](blockds/README.md)
 - [Simple RSA Algorithm](rsa/rsa.go)
 - [Skip List - 2 versions](skiplist/README.md)
 
