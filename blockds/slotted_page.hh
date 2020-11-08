@@ -26,8 +26,8 @@ class SlottedPage {
 
  public:
   SlottedPage(int size)
-      : maxSize_(size), currentSize_(0), payloadOffset_(size * 3 - 2) {
-    data_.resize(size * 3);
+      : maxSize_(size + 10), currentSize_(0), payloadOffset_(maxSize_ * 3 - 2) {
+    data_.resize(maxSize_ * 3);
   }
   std::pair<bool, int> Search(int key) {
     auto index = this->lookUp(key);
