@@ -1,0 +1,42 @@
+#include "test_infras.hh"
+
+#include <benchmark/benchmark.h>
+
+static void BM_SimpleRWLocker(benchmark::State& state) {
+  for (auto _ : state) {
+    auto cnt = std::make_unique<Counter_SimpleRWLocker>(10);
+    pthread_t tid[NO_THREADS];
+
+    for (int idx = 0; idx < NO_THREADS; idx ++) {
+      if (idx % 2 == 0) {
+        pthread_create(&(tid[idx]), NULL, &(atomicRead<Counter_SimpleRWLocker>), cnt.get());
+      } else {
+        pthread_create(&(tid[idx]), NULL, &(atomicAdd<Counter_SimpleRWLocker>), cnt.get());
+      }
+    }
+
+    for (int idx = 0; idx < NO_THREADS; idx ++) pthread_join(tid[idx], NULL);
+  }
+}
+
+static void BM_RWLocker(benchmark::State& state) {
+  for (auto _ : state) {
+    auto cnt = std::make_unique<Counter_RWLocker>(10);
+    pthread_t tid[NO_THREADS];
+
+    for (int idx = 0; idx < NO_THREADS; idx ++) {
+      if (idx % 2 == 0) {
+        pthread_create(&(tid[idx]), NULL, &(atomicRead<Counter_RWLocker>), cnt.get());
+      } else {
+        pthread_create(&(tid[idx]), NULL, &(atomicAdd<Counter_RWLocker>), cnt.get());
+      }
+    }
+
+    for (int idx = 0; idx < NO_THREADS; idx ++) pthread_join(tid[idx], NULL);
+  }
+}
+
+BENCHMARK(BM_SimpleRWLocker);
+BENCHMARK(BM_RWLocker);
+
+BENCHMARK_MAIN();
