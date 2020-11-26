@@ -10,10 +10,10 @@
 - [Sorted Array & Slotted pages](blockds/README.md)
 - [Simple RSA Algorithm](rsa/rsa.go)
 - [Skip List - 2 versions](skiplist/README.md)
+- [Splay Tree](tree/splaytree/README.md)
 
 ## WIP:
 - [Consistent hashing](hashing/README.md)
-- [Splay Tree](tree/splaytree/README.md)
 
 ## Planned:
 - Download files from HTTP 1.1 - IDM-like method

@@ -1,4 +1,5 @@
 #include "splay.h"
+#include <stdlib.h>
 
 /**
  * @brief  A utility function to right rotate subtree rooted with x
@@ -7,6 +8,9 @@ SplayNode *rightRotate(SplayNode *x) {
   SplayNode *y = x->left;
   x->left = y->right;
   y->right = x;
+  // update count
+  x->countLeft = y->countRight;
+  y->countRight = x->countLeft + x->countRight + 1;
   return y;
 }
 
@@ -17,6 +21,9 @@ SplayNode *leftRotate(SplayNode *x) {
   SplayNode *y = x->right;
   x->right = y->left;
   y->left = x;
+  // update count
+  x->countRight = y->countLeft;
+  y->countLeft = x->countLeft + x->countRight + 1;
   return y;
 }
 
@@ -25,7 +32,7 @@ SplayNode *leftRotate(SplayNode *x) {
  *   If key is not present, then it brings the last accessed item at root.
  *   This function modifies the tree and returns the new root
  */
-SplayNode *splay(SplayNode *root, i64 key) {
+SplayNode *splay(SplayNode *root, int key) {
   if (root == NULL || root->key == key) return root;
 
   if (root->key > key) {
@@ -63,7 +70,7 @@ SplayNode *splay(SplayNode *root, i64 key) {
  * @brief    Below is the implementation of all public functions
  */
 
-SplayNode *NewSplayNode(i64 key) {
+SplayNode *NewSplayNode(int key) {
   SplayNode* node = (SplayNode*)malloc(sizeof(SplayNode));
   node->key = key;
   node->countLeft = node->countRight = 0;
@@ -71,11 +78,11 @@ SplayNode *NewSplayNode(i64 key) {
   return (node);
 }
 
-SplayNode *SplaySearch(SplayNode *root, i64 key) {
+SplayNode *SplaySearch(SplayNode *root, int key) {
   return splay(root, key);
 }
 
-SplayNode *SplayInsert(SplayNode *root, i64 key) {
+SplayNode *SplayInsert(SplayNode *root, int key) {
   if (root == NULL) return NewSplayNode(key);
 
   root = splay(root, key);
@@ -103,7 +110,7 @@ SplayNode *SplayInsert(SplayNode *root, i64 key) {
   return newNode;
 }
 
-SplayNode *SplayDelete(SplayNode *root, i64 key) {
+SplayNode *SplayDelete(SplayNode *root, int key) {
   if (!root) return NULL;
 
   root = splay(root, key);
