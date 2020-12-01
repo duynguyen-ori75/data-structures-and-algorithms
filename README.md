@@ -1,6 +1,7 @@
 # A collection of several well-known data structures
 
-## Finish:
+## Finish
+
 - [Bloom filter](bloom/README.md)
 - [B+Tree](tree/btree/README.md)
 - [Concurrency stack & queue (including lock-free implementation of both data structures)](concurrency/README.md)
@@ -13,9 +14,10 @@
 - [Skip List - 2 versions](skiplist/README.md)
 - [Splay Tree](tree/splaytree/README.md)
 
-## WIP:
+## WIP
 
-## Planned:
+## Planned
+
 - Download files from HTTP 1.1 - IDM-like method
 - Log-structured Merge tree
 - External Sort
