@@ -138,9 +138,22 @@ SplayNode *SplayLeftmostNode(SplayNode *node) {
   return node;
 }
 
+SplayNode *SplayRightmostNode(SplayNode *node) {
+  if (node == NULL) return node;
+  for (; node->right != NULL ; node = node->right);
+  return node;
+}
+
 SplayNode *SplayMoveNext(SplayNode *root, int currentKey) {
   root = splay(root, currentKey);
   if (root == NULL || root->right == NULL) return NULL;
   SplayNode *expectedNode = SplayLeftmostNode(root->right);
+  return splay(root, expectedNode->key);
+}
+
+SplayNode *SplayMovePrevious(SplayNode *root, int currentKey) {
+  root = splay(root, currentKey);
+  if (root == NULL || root->left == NULL) return NULL;
+  SplayNode *expectedNode = SplayRightmostNode(root->left);
   return splay(root, expectedNode->key);
 }

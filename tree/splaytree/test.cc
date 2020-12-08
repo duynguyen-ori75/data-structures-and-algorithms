@@ -52,6 +52,17 @@ TEST(SplayTree, SplayLeftmost) {
   }
 }
 
+TEST(SplayTree, SplayRightmost) {
+  SplayNode *root = NewSplayNode(1);
+  for(int i = 3; i <= 200; i += 2)
+    root = SplayInsert(root, 202 - i);
+  for(int i = 199; i >= 1; i -= 2) {
+    SplayNode *rightMost = SplayRightmostNode(root);
+    ASSERT_EQ(rightMost->key, i);
+    root = SplayDelete(root, i);
+  }
+}
+
 TEST(SplayTree, SplayMoveNext) {
   SplayNode *root = NewSplayNode(1);
   for(int i = 2; i <= 100; i ++)
@@ -59,6 +70,17 @@ TEST(SplayTree, SplayMoveNext) {
   root = SplaySearch(root, 1);
   for(int i = 2; i <= 100; i ++) {
     root = SplayMoveNext(root, root->key);
+    ASSERT_EQ(root->key, i);
+  }
+}
+
+TEST(SplayTree, SplayMovePrevious) {
+  SplayNode *root = NewSplayNode(1);
+  for(int i = 2; i <= 100; i ++)
+    root = SplayInsert(root, i);
+  root = SplaySearch(root, 100);
+  for(int i = 99; i >= 1; i --) {
+    root = SplayMovePrevious(root, root->key);
     ASSERT_EQ(root->key, i);
   }
 }
