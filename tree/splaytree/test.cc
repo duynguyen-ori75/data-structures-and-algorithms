@@ -41,6 +41,28 @@ TEST(SplayTree, SplayRemove) {
   ASSERT_TRUE(root == NULL);
 }
 
+TEST(SplayTree, SplayLeftmost) {
+  SplayNode *root = NewSplayNode(1);
+  for(int i = 3; i <= 200; i += 2)
+    root = SplayInsert(root, i);
+  for(int i = 1; i <= 200; i += 2) {
+    SplayNode *leftMost = SplayLeftmostNode(root);
+    ASSERT_EQ(leftMost->key, i);
+    root = SplayDelete(root, i);
+  }
+}
+
+TEST(SplayTree, SplayMoveNext) {
+  SplayNode *root = NewSplayNode(1);
+  for(int i = 2; i <= 100; i ++)
+    root = SplayInsert(root, i);
+  root = SplaySearch(root, 1);
+  for(int i = 2; i <= 100; i ++) {
+    root = SplayMoveNext(root, root->key);
+    ASSERT_EQ(root->key, i);
+  }
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

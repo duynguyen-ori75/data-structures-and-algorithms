@@ -1,5 +1,7 @@
 #include "splay.h"
+
 #include <stdlib.h>
+#include <stdio.h>
 
 /**
  * @brief  A utility function to right rotate subtree rooted with x
@@ -128,4 +130,17 @@ SplayNode *SplayDelete(SplayNode *root, int key) {
   }
   free(temp);
   return root;
+}
+
+SplayNode *SplayLeftmostNode(SplayNode *node) {
+  if (node == NULL) return node;
+  for (; node->left != NULL ; node = node->left);
+  return node;
+}
+
+SplayNode *SplayMoveNext(SplayNode *root, int currentKey) {
+  root = splay(root, currentKey);
+  if (root == NULL || root->right == NULL) return NULL;
+  SplayNode *expectedNode = SplayLeftmostNode(root->right);
+  return splay(root, expectedNode->key);
 }
