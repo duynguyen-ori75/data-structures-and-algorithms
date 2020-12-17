@@ -8,9 +8,9 @@
 - [Consistent hashing](hashing/README.md)
 - [CPU Cache line & false-sharing benchmarks](cpu/README.md)
 - [LRU Cache](https://leetcode.com/problems/lru-cache/)
-- [ReadWriteLock implemented in C](rwlock/README.md)
-- [Sorted Array & Slotted pages](blockds/README.md)
-- [Simple RSA Algorithm](rsa/rsa.go)
+- [Read-Write Lock](rwlock/README.md)
+- [Sorted array & Slotted pages](blockds/README.md)
+- [Simple RSA algorithm](rsa/rsa.go)
 - [Skip List - 2 versions](skiplist/README.md)
 - [Splay Tree](tree/splaytree/README.md)
 

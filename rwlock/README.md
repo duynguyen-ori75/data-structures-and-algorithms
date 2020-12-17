@@ -28,29 +28,35 @@ make
 ### 4 threads
 
 ```shell
-------------------------------------------------------------
-Benchmark                  Time             CPU   Iterations
-------------------------------------------------------------
-BM_SimpleRWLocker      34817 ns        28443 ns        24878
-BM_RWLocker            34082 ns        28239 ns        24629
+---------------------------------------------------------------------------
+Benchmark                                 Time             CPU   Iterations
+---------------------------------------------------------------------------
+BM_SimpleRWLocker_ReadIntensive       34481 ns        28212 ns        25228
+BM_SimpleRWLocker_WriteIntensive      33950 ns        27629 ns        24695
+BM_RWLocker_ReadIntensive             33799 ns        27663 ns        25346
+BM_RWLocker_WriteIntensive            33785 ns        27656 ns        25382
 ```
 
 ### 10 threads
 
 ```shell
-------------------------------------------------------------
-Benchmark                  Time             CPU   Iterations
-------------------------------------------------------------
-BM_SimpleRWLocker     106091 ns       101752 ns         6861
-BM_RWLocker           109094 ns       104258 ns         6910
+---------------------------------------------------------------------------
+Benchmark                                 Time             CPU   Iterations
+---------------------------------------------------------------------------
+BM_SimpleRWLocker_ReadIntensive      106568 ns       101374 ns         6983
+BM_SimpleRWLocker_WriteIntensive     107133 ns       101907 ns         6916
+BM_RWLocker_ReadIntensive            105410 ns       100439 ns         6321
+BM_RWLocker_WriteIntensive           103995 ns        98949 ns         6995
 ```
 
 ### 1000 threads
 
 ```shell
-------------------------------------------------------------
-Benchmark                  Time             CPU   Iterations
-------------------------------------------------------------
-BM_SimpleRWLocker   13561469 ns     13512624 ns           52
-BM_RWLocker         13624746 ns     13619034 ns           52
+---------------------------------------------------------------------------
+Benchmark                                 Time             CPU   Iterations
+---------------------------------------------------------------------------
+BM_SimpleRWLocker_ReadIntensive    13251754 ns     13147669 ns           53
+BM_SimpleRWLocker_WriteIntensive   13382452 ns     13332255 ns           53
+BM_RWLocker_ReadIntensive          13029691 ns     13029422 ns           53
+BM_RWLocker_WriteIntensive         13042133 ns     13017316 ns           53
 ```
