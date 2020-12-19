@@ -9,7 +9,7 @@
 - [CPU Cache line & false-sharing benchmarks](cpu/README.md)
 - [LRU Cache](https://leetcode.com/problems/lru-cache/)
 - [Read-Write Lock](rwlock/README.md)
-- [Sorted array & Slotted pages](blockds/README.md)
+- [Sorted array & Slotted pages](block/README.md)
 - [Simple RSA algorithm](rsa/rsa.go)
 - [Skip List - 2 versions](skiplist/README.md)
 - [Splay Tree](tree/splaytree/README.md)
@@ -19,5 +19,4 @@
 ## Planned
 
 - Download files from HTTP 1.1 - IDM-like method
-- Log-structured Merge tree
 - External Sort
