@@ -1,16 +1,22 @@
 typedef struct SplayNode SplayNode;
+typedef struct SplayTree SplayTree;
 
 struct SplayNode {
-  int key;
+  void *key;
   int countLeft, countRight;
   SplayNode *left, *right;
 };
 
-SplayNode *NewSplayNode(int key);
-SplayNode *SplaySearch(SplayNode*, int key);
-SplayNode *SplayInsert(SplayNode*, int key);
-SplayNode *SplayDelete(SplayNode*, int key);
-SplayNode *SplayLeftmostNode(SplayNode*);
-SplayNode *SplayRightmostNode(SplayNode*);
-SplayNode *SplayMoveNext(SplayNode*, int currentKey);
-SplayNode *SplayMovePrevious(SplayNode*, int currentKey);
+struct SplayTree {
+  SplayNode *root;
+
+  int (*nodeCmp)(SplayNode*, SplayNode*);
+};
+
+SplayTree *NewSplayTree(int (*cmpFunction)(SplayNode*, SplayNode*));
+int SplayTreeIsEmpty(SplayTree*);
+void SplayDestroy(SplayTree*);
+void SplayInsert(SplayTree*, SplayNode *item);
+void SplayDelete(SplayTree*, SplayNode *item);
+SplayNode *SplaySearchGreater(SplayTree*, SplayNode *lookUp);
+SplayNode *SplaySearchAtPosition(SplayTree*, int position);

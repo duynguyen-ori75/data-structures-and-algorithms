@@ -1,5 +1,6 @@
 #include "splay.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -30,49 +31,9 @@ SplayNode *leftRotate(SplayNode *x) {
 }
 
 /**
- * @brief  This function brings the key at root if key is present in tree.
- *   If key is not present, then it brings the last accessed item at root.
- *   This function modifies the tree and returns the new root
+ * @brief      Construct a new Splay node
  */
-SplayNode *splay(SplayNode *root, int key) {
-  if (root == NULL || root->key == key) return root;
-
-  if (root->key > key) {
-    if (root->left == NULL) return root;
-
-    if (root->left->key > key) {
-      root->left->left = splay(root->left->left, key);
-      root = rightRotate(root);
-    }
-    else if (root->left->key < key) {
-      root->left->right = splay(root->left->right, key);
-      if (root->left->right != NULL)
-        root->left = leftRotate(root->left);
-    }
-
-    return (root->left == NULL)? root: rightRotate(root);
-  }
-
-  if (root->right == NULL) return root;
-
-  if (root->right->key > key) {
-    root->right->left = splay(root->right->left, key);
-    if (root->right->left != NULL)
-      root->right = rightRotate(root->right);
-  }
-  else if (root->right->key < key) {
-    root->right->right = splay(root->right->right, key);
-    root = leftRotate(root);
-  }
-
-  return (root->right == NULL)? root: leftRotate(root);
-}
-
-/**
- * @brief    Below is the implementation of all public functions
- */
-
-SplayNode *NewSplayNode(int key) {
+SplayNode *newSplayNode(void *key) {
   SplayNode* node = (SplayNode*)malloc(sizeof(SplayNode));
   node->key = key;
   node->countLeft = node->countRight = 0;
@@ -80,80 +41,164 @@ SplayNode *NewSplayNode(int key) {
   return (node);
 }
 
-SplayNode *SplaySearch(SplayNode *root, int key) {
-  return splay(root, key);
-}
+/**
+ * @brief  This function brings the key at root if key is present in tree.
+ *   If key is not present, then it brings the last accessed item at root.
+ *   This function modifies the tree and returns the new root
+ */
+SplayNode *splay(SplayNode *root, SplayNode *lookUp, int (*nodeCmp)(SplayNode*, SplayNode*)) {
+  if (root == NULL || nodeCmp(root, lookUp) == 0) return root;
 
-SplayNode *SplayInsert(SplayNode *root, int key) {
-  if (root == NULL) return NewSplayNode(key);
+  if (nodeCmp(root, lookUp) > 0) {
+    if (root->left == NULL) return root;
 
-  root = splay(root, key);
-  if (root->key == key) return root;
+    if (nodeCmp(root->left, lookUp) > 0) {
+      root->left->left = splay(root->left->left, lookUp, nodeCmp);
+      root = rightRotate(root);
+    }
+    else if (nodeCmp(root->left, lookUp) < 0) {
+      root->left->right = splay(root->left->right, lookUp, nodeCmp);
+      if (root->left->right != NULL)
+        root->left = leftRotate(root->left);
+    }
 
-  SplayNode *newNode  = NewSplayNode(key);
-  if (root->key > key) {
-    newNode->right = root;
-    newNode->left = root->left;
-    root->left = NULL;
-    // update count
-    newNode->countRight = root->countRight + 1;
-    newNode->countLeft = root->countLeft;
-    root->countLeft = 0;
-  } else {
-    newNode->left = root;
-    newNode->right = root->right;
-    root->right = NULL;
-    // update count
-    newNode->countLeft = root->countLeft + 1;
-    newNode->countRight = root->countRight;
-    root->countRight = 0;
+    return (root->left == NULL) ? root: rightRotate(root);
   }
 
-  return newNode;
+  if (root->right == NULL) return root;
+
+  if (nodeCmp(root->right, lookUp) > 0) {
+    root->right->left = splay(root->right->left, lookUp, nodeCmp);
+    if (root->right->left != NULL)
+      root->right = rightRotate(root->right);
+  }
+  else if (nodeCmp(root->right, lookUp) < 0) {
+    root->right->right = splay(root->right->right, lookUp, nodeCmp);
+    root = leftRotate(root);
+  }
+
+  return (root->right == NULL) ? root: leftRotate(root);
 }
 
-SplayNode *SplayDelete(SplayNode *root, int key) {
-  if (!root) return NULL;
+void destroySplayNode(SplayNode *cur) {
+  if (!cur) return;
+  destroySplayNode(cur->left);
+  destroySplayNode(cur->right);
+  free(cur);
+}
 
-  root = splay(root, key);
-  if (key != root->key) return root;
+/**
+ * @brief    Below is the implementation of all public functions
+ */
+SplayTree *NewSplayTree(int (*cmpFunction)(SplayNode*, SplayNode*)) {
+  SplayTree *ret = (SplayTree*)malloc(sizeof(SplayTree));
+  ret->root = NULL;
+  ret->nodeCmp = cmpFunction;
+  return ret;
+}
+
+void SplayDestroy(SplayTree *tree) {
+  destroySplayNode(tree->root);
+  free(tree);
+}
+
+int SplayTreeIsEmpty(SplayTree *tree) {
+  return (tree->root) ? 0 : 1;
+}
+
+SplayNode *SplaySearchGreater(SplayTree *tree, SplayNode *lookUp) {
+  SplayNode *cur = tree->root;
+  SplayNode *ret = NULL;
+
+  while (cur) {
+    if (tree->nodeCmp(cur, lookUp) == 0) {
+      ret = cur;
+      break;
+    } else if (tree->nodeCmp(cur, lookUp) > 0) {
+      ret = cur;
+      cur = cur->left;
+    } else cur = cur->right;
+  }
+
+  if (!ret) return ret;
+  tree->root = splay(tree->root, ret, tree->nodeCmp);
+  return tree->root;
+}
+
+void SplayInsert(SplayTree *tree, SplayNode *item) {
+  if (tree->root == NULL) {
+    tree->root = newSplayNode(item->key);
+    return;
+  }
+
+  SplayNode *pTmp = SplaySearchGreater(tree, item);
+  if (pTmp && tree->nodeCmp(pTmp, item) == 0) return;
+
+  pTmp = tree->root;
+  SplayNode *newNode = newSplayNode(item->key);
+  if (tree->nodeCmp(pTmp, newNode) > 0) {
+    newNode->right = pTmp;
+    newNode->left = pTmp->left;
+    pTmp->left = NULL;
+    // update count
+    newNode->countRight = pTmp->countRight + 1;
+    newNode->countLeft = pTmp->countLeft;
+    pTmp->countLeft = 0;
+  } else {
+    newNode->left = pTmp;
+    newNode->right = pTmp->right;
+    pTmp->right = NULL;
+    // update count
+    newNode->countLeft = pTmp->countLeft + 1;
+    newNode->countRight = pTmp->countRight;
+    pTmp->countRight = 0;
+  }
+
+  tree->root = newNode;
+}
+
+void SplayDelete(SplayTree *tree, SplayNode *item) {
+  if (!tree->root) return;
+
+  SplayNode *pTmp = SplaySearchGreater(tree, item);
+  if (pTmp && tree->nodeCmp(pTmp, item) != 0) return;
+
+  // come here means that pTmp should be splay-ed to the root
+  assert(pTmp == tree->root);
 
   SplayNode *temp;
-  if (!root->left) {
-    temp = root;
-    root = root->right;
+  if (!pTmp->left) {
+    temp = pTmp;
+    pTmp = pTmp->right;
   } else {
-    temp = root;
-    root = splay(root->left, key);
-    root->right = temp->right;
-    root->countRight = temp->countRight;
+    temp = pTmp;
+    pTmp = splay(pTmp->left, item, tree->nodeCmp);
+    pTmp->right = temp->right;
+    pTmp->countRight = temp->countRight;
   }
   free(temp);
-  return root;
+  tree->root = pTmp;
 }
 
-SplayNode *SplayLeftmostNode(SplayNode *node) {
-  if (node == NULL) return node;
-  for (; node->left != NULL ; node = node->left);
-  return node;
-}
+SplayNode *SplaySearchAtPosition(SplayTree *tree, int position) {
+  if (!tree->root || tree->root->countLeft + tree->root->countRight + 1 < position) return NULL;
 
-SplayNode *SplayRightmostNode(SplayNode *node) {
-  if (node == NULL) return node;
-  for (; node->right != NULL ; node = node->right);
-  return node;
-}
+  SplayNode *cur = tree->root;
+  SplayNode *ret = NULL;
 
-SplayNode *SplayMoveNext(SplayNode *root, int currentKey) {
-  root = splay(root, currentKey);
-  if (root == NULL || root->right == NULL) return NULL;
-  SplayNode *expectedNode = SplayLeftmostNode(root->right);
-  return splay(root, expectedNode->key);
-}
+  while (cur) {
+    if (cur->countLeft + 1 == position) {
+      ret = cur;
+      break;
+    } else if (cur->countLeft + 1 >= position) {
+      cur = cur->left;
+    } else {
+      position -= cur->countLeft + 1;
+      cur = cur->right;
+    }
+  }
 
-SplayNode *SplayMovePrevious(SplayNode *root, int currentKey) {
-  root = splay(root, currentKey);
-  if (root == NULL || root->left == NULL) return NULL;
-  SplayNode *expectedNode = SplayRightmostNode(root->left);
-  return splay(root, expectedNode->key);
+  if (!ret) return ret;
+  tree->root = splay(tree->root, ret, tree->nodeCmp);
+  return tree->root;
 }

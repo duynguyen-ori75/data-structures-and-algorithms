@@ -3,7 +3,9 @@
 Based on exceptional Splay Tree in www.geeksforgeeks.org.
 
 New features:
+- Generic Splay Tree - key can be any type
 - The number of child nodes on both sub-tree of any node (`SplayNode*->countLeft` & `SplayNode*->countRight`)
+- Search key by its index in tree - `SplayNode *SplaySearchAtPosition(SplayTree*, int position)`
 
 ## Definition
 
@@ -20,8 +22,8 @@ make
 ## Requirements
 
 - [googletest](https://github.com/google/googletest)
-- [googlebenchmark](https://github.com/google/benchmark)
 
 ## References
+
 - https://www.geeksforgeeks.org/splay-tree-set-1-insert/
 - https://en.wikipedia.org/wiki/Splay_tree
