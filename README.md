@@ -1,4 +1,4 @@
-# A collection of several well-known data structures, implemented in Golang or C
+# A collection of several well-known data structures and algorithms, implemented in Golang or C
 
 ## Completed
 
