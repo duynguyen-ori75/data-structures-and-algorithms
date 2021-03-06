@@ -2,10 +2,12 @@
 
 Based on exceptional Splay Tree in www.geeksforgeeks.org.
 
-New features:
-- Generic Splay Tree - key can be any type
-- The number of child nodes on both sub-tree of any node (`SplayNode*->countLeft` & `SplayNode*->countRight`)
-- Search key by its index in tree - `SplayNode *SplaySearchAtPosition(SplayTree*, int position)`
+- Bottom-up Splay Tree - `splay.c`
+  - Generic Splay Tree - key can be any type
+  - The number of child nodes on both sub-tree of any node (`SplayNode*->countLeft` & `SplayNode*->countRight`)
+  - Search key by its index in tree - `SplayNode *SplaySearchAtPosition(SplayTree*, int position)`
+- Generic Top-down Splay Tree - `splay-topdown.c`
+  - Does not support `search by position` operation
 
 ## Definition
 
