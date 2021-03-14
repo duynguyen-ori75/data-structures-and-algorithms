@@ -12,6 +12,6 @@
 - [Sorted array & Slotted pages](block/README.md)
 - [Simple RSA algorithm](rsa/rsa.go)
 - [Skip List - 2 versions](skiplist/README.md)
-- [Generic Splay Tree in C](tree/splaytree/README.md)
+- [Generic Splay Tree in C](https://github.com/duynguyen-ori75/splaytree)
 
 ## WIP
