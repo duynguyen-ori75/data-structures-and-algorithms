@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <stdbool.h>
 
 #define MAX_READERS 50
 
@@ -10,7 +11,7 @@ struct RWLocker {
   bool            writer_entered_;  // check whether there is a running-or-registered writer
 };
 
-void ReadLock(RWLocker *locker) {
+void ReadLock(struct RWLocker *locker) {
   pthread_mutex_lock(&(locker->lock_));
   /**
    * there are two cases:
@@ -24,7 +25,7 @@ void ReadLock(RWLocker *locker) {
   pthread_mutex_unlock(&(locker->lock_));
 }
 
-void ReadUnlock(RWLocker *locker) {
+void ReadUnlock(struct RWLocker *locker) {
   pthread_mutex_lock(&(locker->lock_));
   locker->reader_count_ --;
   // one writer registered to be executed
@@ -42,7 +43,7 @@ void ReadUnlock(RWLocker *locker) {
   pthread_mutex_unlock(&(locker->lock_));
 }
 
-void WriteLock(RWLocker *locker) {
+void WriteLock(struct RWLocker *locker) {
   pthread_mutex_lock(&(locker->lock_));
   /**
    * there is (at least) one running writer -> the current writer have to wait for it to finish
@@ -65,7 +66,7 @@ void WriteLock(RWLocker *locker) {
   pthread_mutex_unlock(&(locker->lock_));
 }
 
-void WriteUnlock(RWLocker *locker) {
+void WriteUnlock(struct RWLocker *locker) {
   pthread_mutex_lock(&(locker->lock_));
   // announce that there should be no registered writer at the moment
   locker->writer_entered_ = false;

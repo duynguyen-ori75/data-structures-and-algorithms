@@ -1,23 +1,24 @@
 #include <pthread.h>
+#include <stdbool.h>
 
 struct SimpleRWLocker {
   pthread_mutex_t lock_;
   int             count_;
 };
 
-void SimpleRLock(SimpleRWLocker *locker) {
+void SimpleRLock(struct SimpleRWLocker *locker) {
   pthread_mutex_lock(&(locker->lock_));
   locker->count_ ++;
   pthread_mutex_unlock(&(locker->lock_));
 }
 
-void SimpleRUnlock(SimpleRWLocker *locker) {
+void SimpleRUnlock(struct SimpleRWLocker *locker) {
   pthread_mutex_lock(&(locker->lock_));
   locker->count_ --;
   pthread_mutex_unlock(&(locker->lock_));
 }
 
-void SimpleWLock(SimpleRWLocker *locker) {
+void SimpleWLock(struct SimpleRWLocker *locker) {
   while (true) {
     pthread_mutex_lock(&(locker->lock_));
     if (locker->count_ > 0) {
@@ -28,6 +29,6 @@ void SimpleWLock(SimpleRWLocker *locker) {
   }
 }
 
-void SimpleWUnlock(SimpleRWLocker *locker) {
+void SimpleWUnlock(struct SimpleRWLocker *locker) {
   pthread_mutex_unlock(&(locker->lock_));
 }
