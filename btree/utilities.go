@@ -28,15 +28,3 @@ func removeInt(slice []int, index int) []int {
 func removeInterface(slice []interface{}, index int) []interface{} {
 	return append(slice[:index], slice[index+1:]...)
 }
-
-func newLeafNode(keys []int, values []int) *LeafNode {
-	return &LeafNode{keys: keys, values: values}
-}
-
-func newInternalNode(keys []int, children []interface{}) *InternalNode {
-	return &InternalNode{keys: keys, children: children}
-}
-
-func newBPlusTree(degree int) *BPlusTree {
-	return &BPlusTree{root: newLeafNode([]int{}, []int{}), degree: degree}
-}

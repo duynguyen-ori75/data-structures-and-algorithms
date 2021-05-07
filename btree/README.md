@@ -10,7 +10,7 @@ B+tree is an improvement of traditional B-tree, which is a self-balancing tree d
 
 - Single thread
 - All keys should be unique
-- Assume that all keys and values are `int`
+- Assume that all keys and values are positive integers
 
 ## References
 
