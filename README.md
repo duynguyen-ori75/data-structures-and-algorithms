@@ -3,7 +3,6 @@
 ## Completed
 
 - [Bloom filter](bloom/README.md)
-- [B+Tree](tree/btree/README.md)
 - [Concurrency stack & queue (including lock-free implementation of both data structures)](concurrency/README.md)
 - [Consistent hashing](hashing/README.md)
 - [CPU Cache line & false-sharing benchmarks](cpu/README.md)
@@ -15,3 +14,5 @@
 - [Generic Splay Tree in C](https://github.com/duynguyen-ori75/splaytree)
 
 ## WIP
+
+- [B+Tree](btree/README.md)

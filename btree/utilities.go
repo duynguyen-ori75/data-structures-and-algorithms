@@ -29,8 +29,8 @@ func removeInterface(slice []interface{}, index int) []interface{} {
 	return append(slice[:index], slice[index+1:]...)
 }
 
-func newLeafNode(keys []int, values []int, leftSibling *LeafNode, rightSibling *LeafNode, parent *InternalNode) *LeafNode {
-	return &LeafNode{keys: keys, values: values, leftSibling: leftSibling, rightSibling: rightSibling, parent: parent}
+func newLeafNode(keys []int, values []int) *LeafNode {
+	return &LeafNode{keys: keys, values: values}
 }
 
 func newInternalNode(keys []int, children []interface{}) *InternalNode {
@@ -38,5 +38,5 @@ func newInternalNode(keys []int, children []interface{}) *InternalNode {
 }
 
 func newBPlusTree(degree int) *BPlusTree {
-	return &BPlusTree{root: newLeafNode([]int{}, []int{}, nil, nil, nil), degree: degree}
+	return &BPlusTree{root: newLeafNode([]int{}, []int{}), degree: degree}
 }

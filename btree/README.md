@@ -11,10 +11,6 @@ B+tree is an improvement of traditional B-tree, which is a self-balancing tree d
 - Single thread
 - All keys should be unique
 - Assume that all keys and values are `int`
-- Does not support delete the right-most child (too lazy to handle this corner case)
-  - This can be easily resolved by balancing the right-most child with its left sibling
-
-**Note**: This is a very naive implementation. In real world, `LeafNode` and `InternalNode` should be merged into one class, and their operations should be almost the same. Therefore, this implementation is only suitable for educational purpose.
 
 ## References
 
