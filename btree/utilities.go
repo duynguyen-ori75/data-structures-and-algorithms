@@ -28,3 +28,26 @@ func removeInt(slice []int, index int) []int {
 func removeInterface(slice []interface{}, index int) []interface{} {
 	return append(slice[:index], slice[index+1:]...)
 }
+
+func max(x, y int) int {
+	if x < y {
+		return y
+	}
+	return x
+}
+
+func min(x, y int) int {
+	if x > y {
+		return y
+	}
+	return x
+}
+
+func isLeafNode(node interface{}) bool {
+	switch node.(type) {
+	case LeafNode, *LeafNode:
+		return true
+	default:
+		return false
+	}
+}
