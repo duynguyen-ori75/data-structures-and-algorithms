@@ -2,6 +2,7 @@ package btree
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -50,4 +51,25 @@ func isLeafNode(node interface{}) bool {
 	default:
 		return false
 	}
+}
+
+func debugTree(tree BPlusTree) {
+	type queueItem struct {
+		depth int
+		node  interface{}
+	}
+	var top queueItem
+	var queue []queueItem
+	queue = append(queue, queueItem{depth: 0, node: tree.root})
+	log.Println("===============Debug B+tree================")
+	for len(queue) > 0 {
+		top, queue = queue[0], queue[1:]
+		log.Printf("Layer %d: %+v\n", top.depth, top.node)
+		if node, ok := top.node.(*InternalNode); ok {
+			for _, child := range node.children {
+				queue = append(queue, queueItem{depth: top.depth + 1, node: child})
+			}
+		}
+	}
+	log.Println("===========================================")
 }

@@ -2,16 +2,24 @@ package btree
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"math/rand"
 	"testing"
 )
 
-func TestInsert(t *testing.T) {
-	tree := newBPlusTree(2)
+const ENABLE_LOG bool = false
+const NO_KEYS int = 100
+
+func TestInsertAndSearch(t *testing.T) {
+	if !ENABLE_LOG {
+		log.SetOutput(ioutil.Discard)
+	}
+	tree := newBPlusTree(1)
 	cursor := newCursor(tree)
 	result := make(map[int]int)
 
-	for idx := 1; idx <= 20; idx++ {
+	for idx := 1; idx <= NO_KEYS; idx++ {
 		result[idx] = rand.Int()%1000 + 1
 		err := cursor.Insert(idx, result[idx])
 		if err != nil {
@@ -20,7 +28,7 @@ func TestInsert(t *testing.T) {
 		cursor.Reset()
 	}
 
-	for idx := 1; idx <= 20; idx++ {
+	for idx := 1; idx <= NO_KEYS; idx++ {
 		value := cursor.Search(idx)
 		if value < 0 || value != result[idx] {
 			t.Error(fmt.Sprintf("Key %d is either not found or mapped to wrong value. Found %d - expected %d", idx, value, result[idx]))
