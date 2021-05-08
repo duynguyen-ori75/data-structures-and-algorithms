@@ -31,8 +31,8 @@ func (cursor *Cursor) balance_nonroot() {
 			if len(node.keys) < cursor.tree.degree {
 				if cursor.indices[cursor.depth-1] > 0 {
 					sibling := parentNode.children[currentIdx-1].(*InternalNode)
-					lastIdx := len(sibling.keys) - (len(sibling.keys)-len(node.keys))/2
-					if len(sibling.keys)+len(node.keys) <= cursor.tree.degree*2 {
+					lastIdx := len(sibling.keys) + 1 - (len(sibling.keys)-len(node.keys))/2
+					if len(sibling.keys)+len(node.keys) < cursor.tree.degree*2 {
 						lastIdx = 0
 					}
 					sibling.keys = append(sibling.keys, parentNode.keys[currentIdx-1])
@@ -49,19 +49,18 @@ func (cursor *Cursor) balance_nonroot() {
 				} else {
 					sibling := parentNode.children[currentIdx+1].(*InternalNode)
 					firstIdx := (len(sibling.keys) - len(node.keys)) / 2
-					if len(sibling.keys)+len(node.keys) <= cursor.tree.degree*2 {
-						firstIdx = len(sibling.keys)
+					if len(sibling.keys)+len(node.keys) < cursor.tree.degree*2 {
+						firstIdx = len(sibling.keys) + 1
 					}
-					node.keys = append(append(node.keys, parentNode.keys[currentIdx]), sibling.keys[:firstIdx]...)
+					node.keys = append(append(node.keys, parentNode.keys[currentIdx]), sibling.keys[:firstIdx-1]...)
 					node.children = append(node.children, sibling.children[:firstIdx]...)
 
-					if firstIdx < len(sibling.keys) {
-						parentNode.keys[currentIdx-1] = node.keys[len(node.children)]
-						node.keys = node.keys[:len(node.children)]
+					if firstIdx-1 < len(sibling.keys) {
+						parentNode.keys[currentIdx] = sibling.keys[firstIdx-1]
 						sibling.keys = sibling.keys[firstIdx:]
 						sibling.children = sibling.children[firstIdx:]
 					} else {
-						parentNode.keys = removeInt(parentNode.keys, currentIdx+1)
+						parentNode.keys = removeInt(parentNode.keys, currentIdx)
 						parentNode.children = removeInterface(parentNode.children, currentIdx+1)
 					}
 				}
@@ -95,7 +94,7 @@ func (cursor *Cursor) balance_nonroot() {
 					firstIdx := (len(sibling.keys) - len(node.keys)) / 2
 					if len(sibling.keys)+len(node.keys) <= cursor.tree.degree*2 {
 						parentNode.keys = removeInt(parentNode.keys, currentIdx)
-						parentNode.children = removeInterface(parentNode.children, currentIdx)
+						parentNode.children = removeInterface(parentNode.children, currentIdx+1)
 						firstIdx = len(sibling.keys)
 					}
 					node.keys = append(node.keys, sibling.keys[:firstIdx]...)
@@ -103,7 +102,7 @@ func (cursor *Cursor) balance_nonroot() {
 					sibling.keys = sibling.keys[firstIdx:]
 					sibling.values = sibling.values[firstIdx:]
 				}
-			} else if len(node.keys) > cursor.tree.degree/2 {
+			} else if len(node.keys) >= cursor.tree.degree*2 {
 				// current node has more entries than tree's degree, split current page in half
 				half := len(node.keys) / 2
 				sibling := newLeafNode(node.keys[:half], node.values[:half])
@@ -127,13 +126,14 @@ func (cursor *Cursor) rebalance() {
 	if cursor.depth > 0 {
 		cursor.balance_nonroot()
 	}
-	debugTree(*cursor.tree)
 	if cursor.depth == 0 {
 		node := cursor.nodes[0]
 		switch root := node.(type) {
 		case *InternalNode:
 			if len(root.keys) > cursor.tree.degree*2 {
 				cursor.balance_root()
+			} else if len(root.keys) == 0 {
+				cursor.tree.root = root.children[0]
 			}
 		case *LeafNode:
 			if len(root.keys) >= cursor.tree.degree*2 {

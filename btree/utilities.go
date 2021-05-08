@@ -64,7 +64,7 @@ func debugTree(tree BPlusTree) {
 	log.Println("===============Debug B+tree================")
 	for len(queue) > 0 {
 		top, queue = queue[0], queue[1:]
-		log.Printf("Layer %d: %+v\n", top.depth, top.node)
+		log.Printf("Layer %d: address %p - %+v\n", top.depth, top.node, top.node)
 		if node, ok := top.node.(*InternalNode); ok {
 			for _, child := range node.children {
 				queue = append(queue, queueItem{depth: top.depth + 1, node: child})
