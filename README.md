@@ -2,6 +2,7 @@
 
 ## Completed
 
+- [B+Tree](btree/README.md)
 - [Bloom filter](bloom/README.md)
 - [Concurrency stack & queue (including lock-free implementation of both data structures)](concurrency/README.md)
 - [Consistent hashing](hashing/README.md)
@@ -12,7 +13,3 @@
 - [Simple RSA algorithm](rsa/rsa.go)
 - [Skip List - 2 versions](skiplist/README.md)
 - [Generic Splay Tree in C](https://github.com/duynguyen-ori75/splaytree)
-
-## WIP
-
-- [B+Tree](btree/README.md)
