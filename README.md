@@ -13,3 +13,6 @@
 - [Simple RSA algorithm](rsa/rsa.go)
 - [Skip List - 2 versions](skiplist/README.md)
 - [Generic Splay Tree in C](https://github.com/duynguyen-ori75/splaytree)
+- [Zipfian Distribution in C](zipf/zipf.h)
+
+## WIP

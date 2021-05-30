@@ -7,5 +7,4 @@ golang.org/
 rwlock/output
 blockds/output
 tree/splaytree/output
-btree/target
-btree/Cargo.lock
+zipf/output
