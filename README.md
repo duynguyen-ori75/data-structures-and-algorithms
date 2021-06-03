@@ -2,7 +2,7 @@
 
 ## Completed
 
-- [B+Tree](btree/README.md)
+- [B+Tree](https://github.com/duynguyen-ori75/bplustree)
 - [Bloom filter](bloom/README.md)
 - [Concurrency stack & queue (including lock-free implementation of both data structures)](concurrency/README.md)
 - [Consistent hashing](hashing/README.md)
